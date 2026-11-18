@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "session_id": "s_sandbox_dev",
+  "game_id": "sandbox",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "bulles" },
+  "interaction": { "input": "tap_tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 20, "soft_end_at_minutes": 17 },
+  "difficulty": { "level": 1, "hints": true },
+  "focus": { "source": "ortho", "targets": [] },
+  "items": [
+    { "item_id": "demo_1", "word": "bateau" }
+  ],
+  "collection_state": null
+}
