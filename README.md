@@ -31,6 +31,20 @@ tests/    tests automatiques (validation de config, minuteur simulé, séquence,
 config/   allowed_origins.json (fixé à l'export)
 ```
 
+## Les 7 jeux
+
+| Jeu (game_id) | Mécanique | Commit |
+|---|---|---|
+| Forge-Mots | dictée à tuiles de graphèmes (tap_tap + glisser, per_item/at_end, homophones, phrases) | 9e8df5a |
+| Chasse-Sons | discrimination auditive par phonème isolé, éléments flottants, ECAR | 622d67a |
+| Duo-Mots | paires minimales, 2-3 cartes de même taille, l'autre cible après erreur | add1f9f |
+| Les Sonimaux | aventure 3 actes assemblant les mini-jeux + collection (stades fournis) | 8a95f58 |
+| Mémo-Mots | paires mot-image / homophones-phrase, mots à revoir fournis | 73470bb |
+| Syllabo | tambour : 1 frappe = 1 wagon, découpage fourni, validation auto 3 s | e08c934 |
+| Radar à Lettres | échauffement 2 min, grille fournie en ordre fixe | dd840c8 |
+
+Rapport de conformité (prompt auditeur du guide) : docs/CONFORMITE.md.
+
 ## Lancer en mode développement
 
 ```bash
