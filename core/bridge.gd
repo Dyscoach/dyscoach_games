@@ -175,15 +175,21 @@ func send_error(code: String, message: String) -> void:
 
 func wait_for_config_or_dev(dev_path: String) -> void:
 	await get_tree().create_timer(CONFIG_TIMEOUT_MS / 1000.0).timeout
-	if Time.get_ticks_msec() - _last_config_ms > CONFIG_TIMEOUT_MS:
-		var file := FileAccess.open(dev_path, FileAccess.READ)
-		if file == null:
-			send_error("config_missing", "Aucune configuration reçue ni fichier dev trouvé : %s" % dev_path)
-			return
-		var parsed = JSON.parse_string(file.get_as_text())
-		if parsed is Dictionary:
-			_host_origin = _detect_host_origin()
-			config_received.emit(parsed)
+	if _last_config_ms > 0:
+		return  # une configuration (hôte) est arrivée : pas de repli dev
+	var file := FileAccess.open(dev_path, FileAccess.READ)
+	if file == null:
+		send_error("config_missing", "Aucune configuration reçue ni fichier dev trouvé : %s" % dev_path)
+		return
+	var parsed = JSON.parse_string(file.get_as_text())
+	if parsed is Dictionary:
+		_host_origin = _detect_host_origin()
+		config_received.emit(parsed)
+
+## Repli utilisé par les tests : charge directement une config sans passer par le délai de 2 s.
+func emit_config_now(payload: Dictionary) -> void:
+	_last_config_ms = Time.get_ticks_msec()
+	_handle_message({"type": "config", "payload": payload}, "")
 
 func is_web() -> bool:
 	return _in_web

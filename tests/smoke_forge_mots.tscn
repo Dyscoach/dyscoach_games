@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://smokeforge01"]
+
+[ext_resource type="Script" path="res://tests/smoke_forge_mots.gd" id="1"]
+
+[node name="SmokeForgeMots" type="Node"]
+script = ExtResource("1")

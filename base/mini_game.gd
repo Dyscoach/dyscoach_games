@@ -24,10 +24,20 @@ func setup(cfg: GameConfig) -> void:
 		"level": cfg.difficulty_level,
 	})
 	_setup(cfg)
+	# start() est appelé séparément par le chargeur de jeux (main) : jamais deux fois.
+
+var _started: bool = false
 
 # Méthodes à surcharger
 func _setup(_cfg: GameConfig) -> void: pass
-func start() -> void: pass
+func start() -> void:
+	if _started:
+		return
+	_started = true
+	on_start()
+
+## Surcharger ceci (et non start) pour démarrer le jeu.
+func on_start() -> void: pass
 func on_pause() -> void: pass
 func on_resume() -> void: pass
 func on_time_soft_end() -> void: pass

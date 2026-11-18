@@ -50,6 +50,11 @@ func _on_config(payload: Dictionary) -> void:
 	if path.is_empty() or not ResourceLoader.exists(path):
 		Bridge.send_error("game_unknown", "Jeu inconnu : %s" % cfg.game_id)
 		return
+	# différer d'une frame : le signal peut arriver pendant l'itération des handlers
+	# (la sandbox écoutait aussi config_received et venait d'être queue_free)
+	await get_tree().process_frame
+	if not is_inside_tree():
+		return
 	var packed: PackedScene = load(path)
 	var game := packed.instantiate()
 	add_child(game)

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testforge001"]
+
+[ext_resource type="Script" path="res://tests/test_forge_mots.gd" id="1"]
+
+[node name="TestForgeMots" type="Node"]
+script = ExtResource("1")

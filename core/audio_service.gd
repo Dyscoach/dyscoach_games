@@ -46,7 +46,7 @@ func speak(id: String, url: String, kind: String = "prompt") -> void:
 
 func _simulate_end(id: String) -> void:
 	await get_tree().create_timer(0.4).timeout
-	Bridge.audio_ended.emit(id, "ok")
+	Bridge.audio_ended.emit(id)
 
 func _arm_timeout(id: String, kind: String) -> void:
 	await get_tree().create_timer(Tuning.AUDIO_TIMEOUT_MS / 1000.0).timeout
@@ -59,13 +59,9 @@ func _fail_missing(id: String, kind: String) -> void:
 	audio_missing.emit(id, kind)
 
 ## Notification de la hôte : audio terminé (reçu via Bridge.audio_ended).
-func on_host_audio_ended(id: String) -> void:
-	if _pending.has(id):
-		var kind: String = _pending[id]["kind"]
-		_pending.erase(id)
-		audio_started.emit(id)  # redondant mais sans effet
-		# le jeu écoutait audio_ended ; on relaie via un signal dédié
-		host_audio_finished.emit(id, kind)
+func on_host_audio_ended(_id: String, _kind: String = "") -> void:
+	# la hôte confirme la fin d'un audio ; les jeux écoutent host_audio_finished si besoin
+	pass
 
 signal host_audio_finished(id: String, kind: String)
 

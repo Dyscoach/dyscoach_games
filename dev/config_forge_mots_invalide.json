@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "session_id": "s_forge_bad",
+  "game_id": "forge_mots",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "bulles" },
+  "interaction": { "input": "tap_tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 20, "soft_end_at_minutes": 17 },
+  "difficulty": { "level": 2, "hints": true },
+  "items": [
+    { "item_id": "w_solo", "item_type": "word", "word": "an", "graphemes": ["a", "n"], "distractors": [], "syllables": ["an"], "audio": { "word": "https://cdn.dyscoach.test/audio/x.mp3" } },
+    { "item_id": "w_un_tuile", "item_type": "word", "word": "on", "graphemes": ["on"], "distractors": [], "syllables": ["on"], "audio": {} }
+  ],
+  "collection_state": null
+}
