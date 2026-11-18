@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://smokesyl001"]
+
+[ext_resource type="Script" path="res://tests/smoke_syllabo.gd" id="1"]
+
+[node name="SmokeSyllabo" type="Node"]
+script = ExtResource("1")

@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "session_id": "s_syllabo_dev",
+  "game_id": "syllabo",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": {
+    "id": "default",
+    "skin": "bulles"
+  },
+  "interaction": {
+    "input": "tap",
+    "validation": "per_item"
+  },
+  "a11y": {
+    "reduce_motion": false,
+    "music": true,
+    "show_time_digits": false
+  },
+  "session_limits": {
+    "max_active_minutes": 20,
+    "soft_end_at_minutes": 17
+  },
+  "difficulty": {
+    "level": 2,
+    "hints": true
+  },
+  "focus": {
+    "source": "ortho",
+    "targets": [
+      "syllabes"
+    ]
+  },
+  "items": [
+    {
+      "item_id": "s_bus",
+      "word": "bus",
+      "syllables": [
+        {
+          "text": "bus",
+          "audio": "https://cdn.dyscoach.test/audio/syl_bus.mp3"
+        }
+      ],
+      "syllable_count": 1,
+      "image_id": "img_bus",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_bus.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_bus_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_velo",
+      "word": "vélo",
+      "syllables": [
+        {
+          "text": "vé",
+          "audio": "https://cdn.dyscoach.test/audio/syl_ve.mp3"
+        },
+        {
+          "text": "lo",
+          "audio": "https://cdn.dyscoach.test/audio/syl_lo.mp3"
+        }
+      ],
+      "syllable_count": 2,
+      "image_id": "img_velo",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_velo.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_velo_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_bateau",
+      "word": "bateau",
+      "syllables": [
+        {
+          "text": "ba",
+          "audio": "https://cdn.dyscoach.test/audio/syl_ba.mp3"
+        },
+        {
+          "text": "teau",
+          "audio": "https://cdn.dyscoach.test/audio/syl_teau.mp3"
+        }
+      ],
+      "syllable_count": 2,
+      "image_id": "img_bateau",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_bateau.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_bateau_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_lapin",
+      "word": "lapin",
+      "syllables": [
+        {
+          "text": "la",
+          "audio": "https://cdn.dyscoach.test/audio/syl_la.mp3"
+        },
+        {
+          "text": "pin",
+          "audio": "https://cdn.dyscoach.test/audio/syl_pin.mp3"
+        }
+      ],
+      "syllable_count": 2,
+      "image_id": "img_lapin",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_lapin.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_lapin_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_ballon",
+      "word": "ballon",
+      "syllables": [
+        {
+          "text": "bal",
+          "audio": "https://cdn.dyscoach.test/audio/syl_bal.mp3"
+        },
+        {
+          "text": "lon",
+          "audio": "https://cdn.dyscoach.test/audio/syl_lon.mp3"
+        }
+      ],
+      "syllable_count": 2,
+      "image_id": "img_ballon",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_ballon.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_ballon_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_papillon",
+      "word": "papillon",
+      "syllables": [
+        {
+          "text": "pa",
+          "audio": "https://cdn.dyscoach.test/audio/syl_pa.mp3"
+        },
+        {
+          "text": "pi",
+          "audio": "https://cdn.dyscoach.test/audio/syl_pi.mp3"
+        },
+        {
+          "text": "llon",
+          "audio": "https://cdn.dyscoach.test/audio/syl_llon.mp3"
+        }
+      ],
+      "syllable_count": 3,
+      "image_id": "img_papillon",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_papillon.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_papillon_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_chocolat",
+      "word": "chocolat",
+      "syllables": [
+        {
+          "text": "cho",
+          "audio": "https://cdn.dyscoach.test/audio/syl_cho.mp3"
+        },
+        {
+          "text": "co",
+          "audio": "https://cdn.dyscoach.test/audio/syl_co.mp3"
+        },
+        {
+          "text": "lat",
+          "audio": "https://cdn.dyscoach.test/audio/syl_lat.mp3"
+        }
+      ],
+      "syllable_count": 3,
+      "image_id": "img_chocolat",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_chocolat.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_chocolat_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_elephant",
+      "word": "éléphant",
+      "syllables": [
+        {
+          "text": "é",
+          "audio": "https://cdn.dyscoach.test/audio/syl_e.mp3"
+        },
+        {
+          "text": "lé",
+          "audio": "https://cdn.dyscoach.test/audio/syl_le.mp3"
+        },
+        {
+          "text": "phant",
+          "audio": "https://cdn.dyscoach.test/audio/syl_phant.mp3"
+        }
+      ],
+      "syllable_count": 3,
+      "image_id": "img_elephant",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_elephant.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_elephant_slow.mp3"
+      }
+    },
+    {
+      "item_id": "s_kangourou",
+      "word": "kangourou",
+      "syllables": [
+        {
+          "text": "kan",
+          "audio": "https://cdn.dyscoach.test/audio/syl_kan.mp3"
+        },
+        {
+          "text": "gou",
+          "audio": "https://cdn.dyscoach.test/audio/syl_gou.mp3"
+        },
+        {
+          "text": "rou",
+          "audio": "https://cdn.dyscoach.test/audio/syl_rou.mp3"
+        }
+      ],
+      "syllable_count": 3,
+      "image_id": "img_kangourou",
+      "audio": {
+        "word": "https://cdn.dyscoach.test/audio/s_kangourou.mp3",
+        "slow": "https://cdn.dyscoach.test/audio/s_kangourou_slow.mp3"
+      }
+    }
+  ],
+  "collection_state": null
+}
