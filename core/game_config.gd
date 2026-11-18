@@ -70,7 +70,8 @@ func _validate() -> void:
 		errors.append("interaction.validation invalide (reçu : %s)" % interaction_validation)
 	if max_active_minutes <= 0:
 		errors.append("session_limits.max_active_minutes doit être positif")
-	if items.is_empty():
+	if items.is_empty() and game_id != "sonimaux":
+		# l'aventure Sonimaux ne porte pas d'items racine : chaque zone a sa propre game_config
 		errors.append("items manquants ou vides")
 	if items is Array:
 		for i in items.size():

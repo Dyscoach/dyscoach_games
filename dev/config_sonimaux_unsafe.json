@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "session_id": "s_sonimaux_unsafe",
+  "game_id": "sonimaux",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": {
+    "id": "espace",
+    "skin": "bulles"
+  },
+  "interaction": {
+    "input": "tap",
+    "validation": "per_item"
+  },
+  "a11y": {
+    "reduce_motion": false,
+    "music": true,
+    "show_time_digits": false
+  },
+  "session_limits": {
+    "max_active_minutes": 20,
+    "soft_end_at_minutes": 17
+  },
+  "difficulty": {
+    "level": 1,
+    "hints": true
+  },
+  "focus": {
+    "source": "ortho",
+    "targets": [
+      "/b/"
+    ]
+  },
+  "story": {
+    "episode_id": "ep_vaisseau_1",
+    "title": "Le vaisseau",
+    "setting": "espace",
+    "safety_checked": false,
+    "intro_lines": [
+      {
+        "text": "Bibi décolle dans son petit vaisseau.",
+        "audio": "https://cdn.dyscoach.test/audio/ep1_l1.mp3"
+      },
+      {
+        "text": "Trois épreuves l'attendent pour réparer le moteur.",
+        "audio": "https://cdn.dyscoach.test/audio/ep1_l2.mp3"
+      }
+    ],
+    "zones": [
+      {
+        "zone_id": "zone_radar",
+        "game_id": "chasse_sons",
+        "label": "Le radar",
+        "before_lines": [
+          {
+            "text": "Le radar capte des sons.",
+            "audio": "https://cdn.dyscoach.test/audio/ep1_z1_b1.mp3"
+          }
+        ],
+        "after_lines": [
+          {
+            "text": "Le radar s'allume, bien joué !",
+            "audio": "https://cdn.dyscoach.test/audio/ep1_z1_a1.mp3"
+          }
+        ],
+        "game_config": {
+          "schema_version": 1,
+          "session_id": "s_zone_radar",
+          "game_id": "chasse_sons",
+          "locale": "fr-FR",
+          "age_band": "9-11",
+          "theme": {
+            "id": "espace",
+            "skin": "bulles"
+          },
+          "interaction": {
+            "input": "tap",
+            "validation": "per_item"
+          },
+          "a11y": {
+            "reduce_motion": false,
+            "music": true,
+            "show_time_digits": false
+          },
+          "session_limits": {
+            "max_active_minutes": 20,
+            "soft_end_at_minutes": 17
+          },
+          "difficulty": {
+            "level": 1,
+            "hints": true
+          },
+          "target": {
+            "phoneme_id": "ph_b",
+            "label": "b",
+            "audio_phoneme": "https://cdn.dyscoach.test/audio/ph_b.mp3"
+          },
+          "items": [
+            {
+              "item_id": "z_bateau",
+              "word": "bateau",
+              "has_target": true,
+              "position": "start",
+              "audio": {
+                "word": "https://cdn.dyscoach.test/audio/i_bateau.mp3"
+              }
+            },
+            {
+              "item_id": "z_ballon",
+              "word": "ballon",
+              "has_target": true,
+              "position": "start",
+              "audio": {
+                "word": "https://cdn.dyscoach.test/audio/i_ballon.mp3"
+              }
+            },
+            {
+              "item_id": "z_lune",
+              "word": "lune",
+              "has_target": false,
+              "position": "start",
+              "audio": {
+                "word": "https://cdn.dyscoach.test/audio/i_lune.mp3"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "zone_id": "zone_forge",
+        "game_id": "forge_mots",
+        "label": "La forge",
+        "before_lines": [
+          {
+            "text": "La forge fabrique une pièce du moteur.",
+            "audio": "https://cdn.dyscoach.test/audio/ep1_z2_b1.mp3"
+          }
+        ],
+        "after_lines": [
+          {
+            "text": "La pièce est forgée !",
+            "audio": "https://cdn.dyscoach.test/audio/ep1_z2_a1.mp3"
+          }
+        ],
+        "game_config": {
+          "schema_version": 1,
+          "session_id": "s_zone_forge",
+          "game_id": "forge_mots",
+          "locale": "fr-FR",
+          "age_band": "9-11",
+          "theme": {
+            "id": "espace",
+            "skin": "bulles"
+          },
+          "interaction": {
+            "input": "tap_tap",
+            "validation": "per_item"
+          },
+          "a11y": {
+            "reduce_motion": false,
+            "music": true,
+            "show_time_digits": false
+          },
+          "session_limits": {
+            "max_active_minutes": 20,
+            "soft_end_at_minutes": 17
+          },
+          "difficulty": {
+            "level": 1,
+            "hints": true
+          },
+          "items": [
+            {
+              "item_id": "z_velo",
+              "item_type": "word",
+              "word": "vélo",
+              "graphemes": [
+                "v",
+                "é",
+                "l",
+                "o"
+              ],
+              "distractors": [],
+              "syllables": [
+                "vé",
+                "lo"
+              ],
+              "audio": {
+                "word": "https://cdn.dyscoach.test/audio/w_velo.mp3"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "zone_id": "zone_riviere",
+        "game_id": "duo_mots",
+        "label": "La rivière",
+        "before_lines": [
+          {
+            "text": "La rivière cache deux mots presque pareils.",
+            "audio": "https://cdn.dyscoach.test/audio/ep1_z3_b1.mp3"
+          }
+        ],
+        "after_lines": [
+          {
+            "text": "Le bon mot est trouvé, le moteur tourne !",
+            "audio": "https://cdn.dyscoach.test/audio/ep1_z3_a1.mp3"
+          }
+        ],
+        "game_config": {
+          "schema_version": 1,
+          "session_id": "s_zone_riviere",
+          "game_id": "duo_mots",
+          "locale": "fr-FR",
+          "age_band": "9-11",
+          "theme": {
+            "id": "espace",
+            "skin": "bulles"
+          },
+          "interaction": {
+            "input": "tap",
+            "validation": "per_item"
+          },
+          "a11y": {
+            "reduce_motion": false,
+            "music": true,
+            "show_time_digits": false
+          },
+          "session_limits": {
+            "max_active_minutes": 20,
+            "soft_end_at_minutes": 17
+          },
+          "difficulty": {
+            "level": 2,
+            "hints": true
+          },
+          "items": [
+            {
+              "item_id": "z_poule_boule",
+              "pair_id": "z_pair_pb",
+              "contrast_label": "p/b",
+              "cards": [
+                {
+                  "word": "poule",
+                  "audio": {
+                    "word": "https://cdn.dyscoach.test/audio/m_poule.mp3"
+                  }
+                },
+                {
+                  "word": "boule",
+                  "audio": {
+                    "word": "https://cdn.dyscoach.test/audio/m_boule.mp3"
+                  }
+                }
+              ],
+              "target_index": 0,
+              "order": [
+                0,
+                1
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "outro_lines": [
+      {
+        "text": "Le moteur ronronne, le vaisseau repart.",
+        "audio": "https://cdn.dyscoach.test/audio/ep1_o1.mp3"
+      },
+      {
+        "text": "Merci pour ton aide précieuse !",
+        "audio": "https://cdn.dyscoach.test/audio/ep1_o2.mp3"
+      }
+    ],
+    "rest_lines": [
+      {
+        "text": "Bibi s'endort, bercé par les étoiles.",
+        "audio": "https://cdn.dyscoach.test/audio/ep1_r1.mp3"
+      }
+    ]
+  },
+  "companion": {
+    "companion_id": "bibi",
+    "name": "Bibi"
+  },
+  "collection_state": {
+    "creatures": [
+      {
+        "creature_id": "bibi",
+        "name": "Bibi",
+        "sound_label": "b",
+        "stage": 1
+      },
+      {
+        "creature_id": "dodo",
+        "name": "Dodo",
+        "sound_label": "d",
+        "stage": 0
+      },
+      {
+        "creature_id": "pipo",
+        "name": "Pipo",
+        "sound_label": "p",
+        "stage": 0
+      },
+      {
+        "creature_id": "toti",
+        "name": "Toti",
+        "sound_label": "t",
+        "stage": 0
+      },
+      {
+        "creature_id": "fifou",
+        "name": "Fifou",
+        "sound_label": "f",
+        "stage": 0
+      },
+      {
+        "creature_id": "vivi",
+        "name": "Vivi",
+        "sound_label": "v",
+        "stage": 0
+      },
+      {
+        "creature_id": "chachi",
+        "name": "Chachi",
+        "sound_label": "ch",
+        "stage": 0
+      },
+      {
+        "creature_id": "ouki",
+        "name": "Ouki",
+        "sound_label": "ou",
+        "stage": 0
+      }
+    ],
+    "cosmetics": [],
+    "pending_animations": [
+      {
+        "creature_id": "bibi",
+        "from_stage": 1,
+        "to_stage": 2
+      }
+    ]
+  }
+}
