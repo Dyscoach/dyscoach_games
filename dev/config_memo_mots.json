@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "session_id": "s_memo_dev",
+  "game_id": "memo_mots",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": {
+    "id": "default",
+    "skin": "bulles"
+  },
+  "interaction": {
+    "input": "tap",
+    "validation": "per_item"
+  },
+  "a11y": {
+    "reduce_motion": false,
+    "music": true,
+    "show_time_digits": false
+  },
+  "session_limits": {
+    "max_active_minutes": 20,
+    "soft_end_at_minutes": 17
+  },
+  "difficulty": {
+    "level": 2,
+    "hints": true
+  },
+  "focus": {
+    "source": "ortho",
+    "targets": [
+      "lexique orthogonal"
+    ]
+  },
+  "items": [
+    {
+      "item_id": "m_oignon",
+      "pair_id": "p_oignon",
+      "kind": "word_image",
+      "due_reason": "spaced_1d",
+      "card_a": {
+        "text": "oignon",
+        "image_id": "img_oignon",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_oignon.mp3"
+        }
+      },
+      "card_b": {
+        "text": "oignon",
+        "image_id": "img_oignon",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_oignon.mp3"
+        }
+      }
+    },
+    {
+      "item_id": "m_yeux",
+      "pair_id": "p_yeux",
+      "kind": "word_image",
+      "due_reason": "spaced_3d",
+      "card_a": {
+        "text": "yeux",
+        "image_id": "img_yeux",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_yeux.mp3"
+        }
+      },
+      "card_b": {
+        "text": "yeux",
+        "image_id": "img_yeux",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_yeux.mp3"
+        }
+      }
+    },
+    {
+      "item_id": "m_femme",
+      "pair_id": "p_femme",
+      "kind": "word_image",
+      "due_reason": "spaced_7d",
+      "card_a": {
+        "text": "femme",
+        "image_id": "img_femme",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_femme.mp3"
+        }
+      },
+      "card_b": {
+        "text": "femme",
+        "image_id": "img_femme",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_femme.mp3"
+        }
+      }
+    },
+    {
+      "item_id": "m_automne",
+      "pair_id": "p_automne",
+      "kind": "word_image",
+      "due_reason": "spaced_1d",
+      "card_a": {
+        "text": "automne",
+        "image_id": "img_automne",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_automne.mp3"
+        }
+      },
+      "card_b": {
+        "text": "automne",
+        "image_id": "img_automne",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_automne.mp3"
+        }
+      }
+    },
+    {
+      "item_id": "m_cheveux",
+      "pair_id": "p_cheveux",
+      "kind": "word_image",
+      "due_reason": "spaced_3d",
+      "card_a": {
+        "text": "cheveux",
+        "image_id": "",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_cheveux.mp3"
+        }
+      },
+      "card_b": {
+        "text": "cheveux",
+        "image_id": "",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_cheveux.mp3"
+        }
+      }
+    },
+    {
+      "item_id": "m_escargot",
+      "pair_id": "p_escargot",
+      "kind": "word_image",
+      "due_reason": "spaced_7d",
+      "card_a": {
+        "text": "escargot",
+        "image_id": "img_escargot",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_escargot.mp3"
+        }
+      },
+      "card_b": {
+        "text": "escargot",
+        "image_id": "img_escargot",
+        "audio": {
+          "word": "https://cdn.dyscoach.test/audio/m_escargot.mp3"
+        }
+      }
+    }
+  ],
+  "collection_state": null
+}
