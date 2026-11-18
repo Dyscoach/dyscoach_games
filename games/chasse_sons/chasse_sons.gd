@@ -36,12 +36,6 @@ func _build_ui() -> void:
 	bg.color = ThemeService.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
-	_main_vb = VBoxContainer.new()
-	_main_vb.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_main_vb.add_theme_constant_override("margin_left", 48)
-	_main_vb.add_theme_constant_override("margin_right", 48)
-	_main_vb.add_theme_constant_override("margin_top", 24)
-	_main_vb.add_theme_constant_override("separation", 16)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -146,6 +140,7 @@ func _layout_items() -> void:
 		item.item_tapped.connect(_on_item_tapped)
 		_items_layer.add_child(item)
 		item.begin_drift(center, Tuning.CHASSE_DRIFT_AMPLITUDE, Tuning.CHASSE_DRIFT_PERIOD_S, i)
+		ThemeService.gentle_appear(item, i * Tuning.FX_APPEAR_STAGGER_S)
 		i += 1
 
 # --- interactions ---
@@ -166,8 +161,8 @@ func _on_item_tapped(item: FloatingItem) -> void:
 	if has_target:
 		# bonne réponse : l'élément éclot, réussite notée
 		item.hatch()
+		Sfx.pair_bell()
 		_found_in_round += 1
-		_items_done += 1
 		report_answer(item_id, true, {"phoneme_id": str(_target.get("phoneme_id", "")), "has_target": true, "tapped_target": true, "position": position}, 1, Time.get_ticks_msec() - _item_start_ms)
 		complete_item(item_id, true, 1, 0)
 		_set_status(Strings.CHASSE_SUCCESS % str(data.get("word", "")))

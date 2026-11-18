@@ -50,12 +50,18 @@ const RADAR_SESSION_MAX_MS := 120000      # plafond : 2 minutes d'activité par 
 const SONIMAUX_LINE_MAX_WORDS_CHILD := 12  # longueur max d'une ligne d'histoire (6-8 ans)
 const SONIMAUX_LINE_MAX_WORDS := 20        # longueur max d'une ligne d'histoire (9 ans et +)
 
+# --- Pastilles de progression ---
+const PROGRESS_DOT_RADIUS := 13.0          # rayon d'une pastille (px)
+const PROGRESS_DOT_GAP := 14.0             # espacement entre pastilles (px)
+
 # --- FX et style ---
 const UI_CORNER_RADIUS := 28.0
 const UI_CORNER_RADIUS_SMALL := 18.0
 const FX_SPARKLE_COUNT := 22              # particules d'une gerbe d'étincelles
-const FX_SHAKE_AMPLITUDE := 9.0           # amplitude du tremblement doux (px)
+const FX_SHAKE_ANGLE_DEG := 4.0           # amplitude du tremblement doux (rotation, degrés)
 const FX_SUCCESS_PULSE_SCALE := 1.12      # pulsation d'un élément réussi
+const FX_APPEAR_STAGGER_S := 0.05         # décalage d'apparition en cascade (s)
+const FX_CELEBRATION_MS := 1600           # durée du moment de célébration de fin (ms)
 const FONT_SIZE_TITLE := 64
 const FONT_SIZE_BODY := 44
 const FONT_SIZE_TILE := 72

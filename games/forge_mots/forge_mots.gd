@@ -281,6 +281,7 @@ func _place_tile_into(tile: GraphemeTile, index: int) -> void:
 	_slot_tiles[index].text = tile.grapheme
 	_slot_tiles[index].disabled = false
 	_slot_tiles[index].focus_mode = Control.FOCUS_NONE
+	Sfx.soft_flip()
 	_reserve_tiles.erase(tile)
 	tile.queue_free()
 	_tap_selected = null
@@ -460,6 +461,7 @@ func _word_complete() -> void:
 		ThemeService.success_pulse(t)
 	if AudioService.mode == AudioService.Mode.LOCAL:
 		AudioService.play_success_chime()
+	_finished_words += 1
 	complete_item(str(_current.get("item_id", "")), _first_try, _attempt_no + 1, _hints_used)
 	var timer := get_tree().create_timer(1.6)
 	timer.timeout.connect(_next_word)

@@ -80,7 +80,11 @@ func _test_pair_logic() -> void:
 	await get_tree().process_frame
 	check(same[0].is_matched and same[1].is_matched, "paire trouvée : les 2 cartes marquées")
 	check(game._matched_pairs == 1, "compteur de paires = 1")
+	check(game._items_done == 1, "éléments travaillés comptés UNE fois (pas de double comptage)")
 	check(not completed.is_empty(), "item_completed émis pour la paire")
+	check(game._dots != null, "pastilles de progression présentes")
+	check(game._dots._total == 6, "une pastille par paire (6)")
+	check(game._dots._lit == 1, "première pastille allumée après la paire")
 	# retourner 2 cartes de paires DIFFÉRENTES : se retournent après délai, sans pénalité
 	var d1: MemoCard = null
 	var d2: MemoCard = null
@@ -141,6 +145,16 @@ func _test_homophone_config() -> void:
 		if c.display_word().length() <= 5:
 			found_word = true
 	check(found_phrase and found_word, "phrases à trou ET mots courts présents")
+	# le sous-titre (consigne écrite) est affiché sous le titre
+	var has_subtitle := false
+	for c in game._main_vb.get_children():
+		if c is HBoxContainer:
+			for cc in c.get_children():
+				if cc is VBoxContainer:
+					for lbl in cc.get_children():
+						if lbl is Label and lbl.text == Strings.MEMO_SUB:
+							has_subtitle = true
+	check(has_subtitle, "consigne écrite affichée sous le titre")
 	game.queue_free()
 
 func _finish() -> void:

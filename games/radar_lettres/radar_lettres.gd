@@ -165,6 +165,7 @@ func _on_cell_pressed(btn: Button) -> void:
 	if tapped == target:
 		# cible touchée : s'illumine et reste visible
 		_found_count += 1
+		Sfx.pair_bell()
 		btn.disabled = true
 		btn.focus_mode = Control.FOCUS_NONE
 		var sb := StyleBoxFlat.new()
@@ -180,7 +181,6 @@ func _on_cell_pressed(btn: Button) -> void:
 			# grille terminée : mini-bilan puis suivante
 			_set_status(Strings.RADAR_FOUND % [int(_current.get("target_count", 0)), target])
 			complete_item(item_id, _attempts == int(_current.get("target_count", 0)), _attempts, 0)
-			_items_done += 1
 			var timer := get_tree().create_timer(1.6)
 			timer.timeout.connect(_next_grid)
 	else:

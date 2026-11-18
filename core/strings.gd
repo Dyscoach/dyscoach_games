@@ -56,6 +56,8 @@ const MEMO_TITLE := "Mémo-Mots"
 const MEMO_SUB := "Retrouve les paires, retiens les mots."
 const MEMO_FOUND := "Paire trouvée : %s !"
 const MEMO_RETRY := "On retourne les cartes, on regarde bien."
+const MEMO_PAIRES := "paires"
+const MEMO_CELEBRATION := "Toutes les paires sont retrouvées !"
 
 # --- Syllabo ---
 const SYL_TITLE := "Syllabo"

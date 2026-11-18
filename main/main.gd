@@ -29,7 +29,8 @@ func _ready() -> void:
 func _on_config(payload: Dictionary) -> void:
 	# recharger la scène racine serait coûteux : on change le jeu en place
 	if _current_game != null:
-		_current_game.queue_free()
+		# fondu de sortie doux avant le nouveau jeu (immédiat si reduce_motion)
+		ThemeService.gentle_release(_current_game, 0.1)
 		_current_game = null
 	var cfg := GameConfig.new()
 	cfg.parse(payload)

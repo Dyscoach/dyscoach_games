@@ -58,6 +58,13 @@ func _build_ui() -> void:
 	top.add_child(title)
 	top.add_child(build_time_gauge())
 
+	# consigne écrite affichée en permanence sous le titre (une seule idée, courte)
+	var instruction := Label.new()
+	instruction.text = Strings.SYL_TAP_HINT
+	instruction.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ThemeService.style_label(instruction, int(Tuning.FONT_SIZE_BODY * 0.8), ThemeService.INK_SOFT)
+	_main_vb.add_child(instruction)
+
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
@@ -139,6 +146,7 @@ func _on_drum() -> void:
 	# un toucher = un wagon : le nombre de wagons suit exactement le nombre de touchers
 	_tapped_count += 1
 	_add_wagon()
+	Sfx.soft_flip()
 	if AudioService.mode == AudioService.Mode.LOCAL:
 		AudioService.play_gentle_pop()
 
@@ -150,26 +158,26 @@ func _add_wagon() -> void:
 	sb.set_border_width_all(3)
 	sb.set_corner_radius_all(int(Tuning.UI_CORNER_RADIUS_SMALL))
 	wagon.add_theme_stylebox_override("panel", sb)
-	wagon.custom_minimum_size = Vector2(150, 110)
-	var wheel1 := _make_wheel()
-	var wheel2 := _make_wheel()
-	var hb := HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 20)
-	hb.alignment = BoxContainer.ALIGNMENT_CENTER
+	wagon.custom_minimum_size = Vector2(150, 130)
+	# corps du wagon : un caisson avec deux roues dessinées (une frappe = un wagon complet)
+	var body := VBoxContainer.new()
+	body.alignment = BoxContainer.ALIGNMENT_CENTER
+	var caisson := ColorRect.new()
+	caisson.color = ThemeService.ACCENT_SOFT
+	caisson.custom_minimum_size = Vector2(110, 44)
 	var wheels := HBoxContainer.new()
 	wheels.alignment = BoxContainer.ALIGNMENT_CENTER
-	wheels.add_child(wheel1)
-	wheels.add_child(wheel2)
+	wheels.add_theme_constant_override("separation", 26)
+	for i in 2:
+		var wheel := ColorRect.new()
+		wheel.color = ThemeService.INK
+		wheel.custom_minimum_size = Vector2(22, 22)
+		wheels.add_child(wheel)
+	body.add_child(caisson)
+	body.add_child(wheels)
+	wagon.add_child(body)
 	_train_box.add_child(wagon)
-	wheel1.queue_free()
-	wheel2.queue_free()
-	hb.queue_free()
-
-func _make_wheel() -> ColorRect:
-	var w := ColorRect.new()
-	w.color = ThemeService.INK
-	w.custom_minimum_size = Vector2(22, 22)
-	return w
+	ThemeService.gentle_appear(wagon)
 
 # --- validation ---
 
@@ -219,8 +227,9 @@ func _complete_word() -> void:
 	var syllables: Array = _current.get("syllables", [])
 	_glow_wagons(0, syllables)
 	complete_item(str(_current.get("item_id", "")), _attempt_no == 1, _attempt_no, 0)
-	_items_done += 1
 	ThemeService.sparkle_burst(_train_box, _train_box.size * 0.5)
+	if AudioService.mode == AudioService.Mode.LOCAL:
+		AudioService.play_success_chime()
 	var timer := get_tree().create_timer(2.0)
 	timer.timeout.connect(_next_word)
 

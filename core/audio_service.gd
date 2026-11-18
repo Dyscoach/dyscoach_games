@@ -71,12 +71,13 @@ func stop_all() -> void:
 		Bridge.send_stop_audio()
 	_current_id = ""
 
-## Petit effet local (hors web uniquement) : bip doux de réussite, note simple.
+## Petit effet local (hors web uniquement) : bips synthétisés.
+## Tous respectent ThemeService.music_enabled (a11y.music) : silence si désactivé.
 func play_success_chime() -> void:
-	_play_tone(660.0, 0.12)
+	Sfx.success_chime()
 
 func play_gentle_pop() -> void:
-	_play_tone(440.0, 0.08)
+	Sfx.soft_flip()
 
 func _play_tone(freq: float, duration: float) -> void:
 	if _local_player == null:

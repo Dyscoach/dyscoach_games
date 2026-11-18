@@ -91,7 +91,7 @@ func _next_pair() -> void:
 
 func _build_cards() -> void:
 	for c in _cards:
-		c.queue_free()
+		ThemeService.gentle_release(c)
 	_cards.clear()
 	var cards: Array = _current.get("cards", [])
 	var order: Array = _current.get("order", [])
@@ -128,6 +128,7 @@ func _build_cards() -> void:
 			card.pressed.connect(_on_card_pressed.bind(idx, false))
 		_cards_row.add_child(card)
 		_cards.append(card)
+		ThemeService.gentle_appear(card, (indices.find(idx)) * Tuning.FX_APPEAR_STAGGER_S)
 	_set_status("")
 
 func _is_written_variant() -> bool:
@@ -191,7 +192,6 @@ func _on_card_pressed(card_index: int, is_target: bool) -> void:
 		report_answer(str(_current.get("item_id", "")), true, detail, _attempts, Time.get_ticks_msec() - _item_start_ms)
 		compare_both_words_safe()
 		complete_item(str(_current.get("item_id", "")), _first_try, _attempts, 0)
-		_items_done += 1
 		_set_status(Strings.DUO_SUCCESS % chosen_word)
 		var timer := get_tree().create_timer(1.8)
 		timer.timeout.connect(_next_pair)
