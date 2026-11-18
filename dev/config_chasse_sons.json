@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "session_id": "s_chasse_dev",
+  "game_id": "chasse_sons",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "bulles" },
+  "interaction": { "input": "tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 20, "soft_end_at_minutes": 17 },
+  "difficulty": { "level": 1, "hints": true },
+  "focus": { "source": "ortho", "targets": ["/b/"] },
+  "target": {
+    "phoneme_id": "ph_b",
+    "label": "b",
+    "audio_phoneme": "https://cdn.dyscoach.test/audio/ph_b.mp3"
+  },
+  "rounds": 3,
+  "items": [
+    { "item_id": "i_bateau", "word": "bateau", "image_id": "img_bateau", "has_target": true, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_bateau.mp3" } },
+    { "item_id": "i_ballon", "word": "ballon", "image_id": "img_ballon", "has_target": true, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_ballon.mp3" } },
+    { "item_id": "i_bebe", "word": "bébé", "image_id": "img_bebe", "has_target": true, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_bebe.mp3" } },
+    { "item_id": "i_bus", "word": "bus", "image_id": "img_bus", "has_target": true, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_bus.mp3" } },
+    { "item_id": "i_dent", "word": "dent", "image_id": "img_dent", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_dent.mp3" } },
+    { "item_id": "i_dragon", "word": "dragon", "image_id": "img_dragon", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_dragon.mp3" } },
+    { "item_id": "i_doigt", "word": "doigt", "image_id": "img_doigt", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_doigt.mp3" } },
+    { "item_id": "i_lune", "word": "lune", "image_id": "img_lune", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_lune.mp3" } },
+    { "item_id": "i_velo", "word": "vélo", "image_id": "img_velo", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_velo.mp3" } },
+    { "item_id": "i_tigre", "word": "tigre", "image_id": "img_tigre", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_tigre.mp3" } }
+  ],
+  "collection_state": null
+}
