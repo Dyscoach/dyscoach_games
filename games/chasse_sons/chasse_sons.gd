@@ -19,6 +19,7 @@ var _items_layer: Control = null
 var _speaker: Button = null
 var _instruction: Label = null
 var _item_start_ms: int = 0
+var _dots: ProgressDots = null
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_chasse_config(cfg.raw)
@@ -64,6 +65,17 @@ func _build_ui() -> void:
 	_instruction.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ThemeService.style_label(_instruction, Tuning.FONT_SIZE_BODY, ThemeService.INK, true)
 	_main_vb.add_child(_instruction)
+
+	# progression calme : une pastille par cible attendue dans la configuration
+	var dots_wrap := CenterContainer.new()
+	_dots = ProgressDots.new()
+	var wanted_targets := 0
+	for it in config.items:
+		if bool(it.get("has_target", false)):
+			wanted_targets += 1
+	_dots.setup(maxi(wanted_targets, 1))
+	dots_wrap.add_child(_dots)
+	_main_vb.add_child(dots_wrap)
 
 	_items_layer = Control.new()
 	_items_layer.clip_contents = true
@@ -163,6 +175,7 @@ func _on_item_tapped(item: FloatingItem) -> void:
 		item.hatch()
 		Sfx.pair_bell()
 		_found_in_round += 1
+		_dots.light_next()
 		report_answer(item_id, true, {"phoneme_id": str(_target.get("phoneme_id", "")), "has_target": true, "tapped_target": true, "position": position}, 1, Time.get_ticks_msec() - _item_start_ms)
 		complete_item(item_id, true, 1, 0)
 		_set_status(Strings.CHASSE_SUCCESS % str(data.get("word", "")))

@@ -31,6 +31,8 @@ var _reserve_grid: GridContainer = null
 var _status: Label = null
 var _speaker: Button = null
 var _validate_btn: Button = null
+var _dots: ProgressDots = null
+var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
 	_validation_at_end = cfg.interaction_validation == "at_end"
@@ -71,6 +73,20 @@ func _build_ui() -> void:
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
 	top.add_child(build_time_gauge())
+
+	# consigne écrite affichée en permanence sous le titre (une seule idée, courte)
+	var subtitle := Label.new()
+	subtitle.text = Strings.FORGE_SUB
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ThemeService.style_label(subtitle, int(Tuning.FONT_SIZE_BODY * 0.8), ThemeService.INK_SOFT)
+	_main_vb.add_child(subtitle)
+
+	# progression calme : une pastille par mot de la configuration (réinsertions gardées)
+	var dots_wrap := CenterContainer.new()
+	_dots = ProgressDots.new()
+	_dots.setup(maxi(config.items.size(), 1))
+	dots_wrap.add_child(_dots)
+	_main_vb.add_child(dots_wrap)
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -461,6 +477,7 @@ func _word_complete() -> void:
 		ThemeService.success_pulse(t)
 	if AudioService.mode == AudioService.Mode.LOCAL:
 		AudioService.play_success_chime()
+	_dots.light_next()
 	_finished_words += 1
 	complete_item(str(_current.get("item_id", "")), _first_try, _attempt_no + 1, _hints_used)
 	var timer := get_tree().create_timer(1.6)
@@ -559,6 +576,16 @@ func _set_status(text: String) -> void:
 		_status.text = text
 
 func _show_summary() -> void:
+	if not _finished and not _finish_requested:
+		# tous les mots travaillés : bref moment de célébration, jamais de score
+		_finished = true
+		_set_status(Strings.SUCCESS_BRAVO)
+		Sfx.celebration()
+		var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
+		timer.timeout.connect(func() -> void:
+			_set_status(Strings.SUMMARY_DONE % _finished_words)
+			finish_session("completed"))
+		return
 	_set_status(Strings.SUMMARY_DONE % _finished_words)
 	finish_session("completed")
 

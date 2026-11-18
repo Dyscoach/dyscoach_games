@@ -19,6 +19,8 @@ var _status: Label = null
 var _model_label: Label = null
 var _grid: GridContainer = null
 var _speaker: Button = null
+var _dots: ProgressDots = null
+var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_radar_items(cfg.items)
@@ -65,6 +67,13 @@ func _build_ui() -> void:
 	ThemeService.style_label(_model_label, int(Tuning.FONT_SIZE_TITLE * 0.8), ThemeService.ACCENT, true)
 	_main_vb.add_child(_model_label)
 
+	# progression calme : une pastille par grille de la configuration
+	var dots_wrap := CenterContainer.new()
+	_dots = ProgressDots.new()
+	_dots.setup(maxi(config.items.size(), 1))
+	dots_wrap.add_child(_dots)
+	_main_vb.add_child(dots_wrap)
+
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
@@ -86,13 +95,11 @@ func _next_grid() -> void:
 		return
 	# plafond de 2 minutes : la séance s'arrête proprement
 	if Time.get_ticks_msec() >= _session_deadline_ms:
-		_set_status(Strings.SUMMARY_DONE % _items_done)
-		finish_session("completed")
+		_finish_session_quietly()
 		return
 	_current_index += 1
 	if _current_index >= _items.size():
-		_set_status(Strings.SUMMARY_DONE % _items_done)
-		finish_session("completed")
+		_finish_session_quietly()
 		return
 	_current = _items[_current_index]
 	_found_count = 0
@@ -181,6 +188,7 @@ func _on_cell_pressed(btn: Button) -> void:
 			# grille terminée : mini-bilan puis suivante
 			_set_status(Strings.RADAR_FOUND % [int(_current.get("target_count", 0)), target])
 			complete_item(item_id, _attempts == int(_current.get("target_count", 0)), _attempts, 0)
+			_dots.light_next()
 			var timer := get_tree().create_timer(1.6)
 			timer.timeout.connect(_next_grid)
 	else:
@@ -190,11 +198,22 @@ func _on_cell_pressed(btn: Button) -> void:
 		report_answer(item_id, false, {"target": target, "tapped": tapped, "was_target": false}, _attempts, Time.get_ticks_msec() - _item_start_ms)
 		_set_status(Strings.RADAR_WRONG % tapped)
 
+func _finish_session_quietly() -> void:
+	if _finished:
+		return
+	_finished = true
+	# toutes les grilles travaillées : bref moment de célébration, jamais de score
+	_set_status(Strings.SUCCESS_BRAVO)
+	Sfx.celebration()
+	var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
+	timer.timeout.connect(func() -> void:
+		_set_status(Strings.SUMMARY_DONE % _items_done)
+		finish_session("completed"))
+
 func _process(_delta: float) -> void:
 	# plafond de séance : 2 minutes d'activité au total (critère du document)
-	if not _finish_requested and _session_deadline_ms > 0 and Time.get_ticks_msec() >= _session_deadline_ms:
-		_set_status(Strings.SUMMARY_DONE % _items_done)
-		finish_session("completed")
+	if not _finish_requested and not _finished and _session_deadline_ms > 0 and Time.get_ticks_msec() >= _session_deadline_ms:
+		_finish_session_quietly()
 
 func _set_status(text: String) -> void:
 	if _status != null:

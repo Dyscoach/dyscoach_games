@@ -15,6 +15,8 @@ var _main_vb: VBoxContainer = null
 var _cards_row: HBoxContainer = null
 var _status: Label = null
 var _speaker: Button = null
+var _dots: ProgressDots = null
+var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_duo_items(cfg.items)
@@ -57,6 +59,21 @@ func _build_ui() -> void:
 	top.add_child(title)
 	top.add_child(build_time_gauge())
 
+	# consigne écrite affichée en permanence sous le titre (une seule idée, courte)
+	var subtitle := Label.new()
+	subtitle.text = Strings.DUO_SUB
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ThemeService.style_label(subtitle, int(Tuning.FONT_SIZE_BODY * 0.8), ThemeService.INK_SOFT)
+	_main_vb.add_child(subtitle)
+
+	# progression calme : une pastille par paire de la configuration (réinsertions
+	# incluses sans déborder : light_next est gardé)
+	var dots_wrap := CenterContainer.new()
+	_dots = ProgressDots.new()
+	_dots.setup(maxi(config.items.size(), 1))
+	dots_wrap.add_child(_dots)
+	_main_vb.add_child(dots_wrap)
+
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
@@ -75,8 +92,14 @@ func on_start() -> void:
 
 func _next_pair() -> void:
 	if _queue.is_empty() or _finish_requested:
-		_set_status(Strings.SUMMARY_DONE % _items_done)
-		finish_session("completed")
+		# toutes les paires travaillées : bref moment de célébration, jamais de score
+		_finished = true
+		_set_status(Strings.SUCCESS_BRAVO, "★")
+		Sfx.celebration()
+		var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
+		timer.timeout.connect(func() -> void:
+			_set_status(Strings.SUMMARY_DONE % _items_done, "")
+			finish_session("completed"))
 		return
 	var entry: Dictionary = _queue.pop_front()
 	_current = entry["item"]
@@ -189,18 +212,23 @@ func _on_card_pressed(card_index: int, is_target: bool) -> void:
 		card.add_theme_color_override("font_disabled_color", ThemeService.GOOD)
 		card.disabled = true
 		ThemeService.sparkle_burst(card, card.size * 0.5, ThemeService.GOOD)
+		Sfx.pair_bell()
 		report_answer(str(_current.get("item_id", "")), true, detail, _attempts, Time.get_ticks_msec() - _item_start_ms)
 		compare_both_words_safe()
 		complete_item(str(_current.get("item_id", "")), _first_try, _attempts, 0)
-		_set_status(Strings.DUO_SUCCESS % chosen_word)
+		_set_status(Strings.DUO_SUCCESS % chosen_word, "★")
+		_dots.light_next()
 		var timer := get_tree().create_timer(1.8)
-		timer.timeout.connect(_next_pair)
+		timer.timeout.connect(func() -> void:
+			if _finished or not is_inside_tree():
+				return
+			_next_pair())
 	else:
 		_first_try = false
 		var card: Button = _cards[_card_button_index(card_index)]
 		ThemeService.gentle_shake(card)
 		report_answer(str(_current.get("item_id", "")), false, detail, _attempts, Time.get_ticks_msec() - _item_start_ms)
-		_set_status(Strings.DUO_RETRY)
+		_set_status(Strings.DUO_RETRY, "")
 		compare_both_words_safe()
 		_requeue_with_other_target()
 
@@ -233,7 +261,7 @@ func _requeue_with_other_target() -> void:
 		item["target_index"] = new_target
 		_queue.append({"item": item, "target": new_target})
 
-func _set_status(text: String) -> void:
+func _set_status(text: String, icon: String = "") -> void:
 	if _status != null:
 		_status.text = text
 

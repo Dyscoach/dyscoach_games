@@ -21,6 +21,7 @@ var _story_label: Label = null
 var _buttons_box: VBoxContainer = null
 var _carnet_btn: Button = null
 var _pending_animations_done: bool = false
+var _dots: ProgressDots = null
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_sonimaux_config(cfg.raw)
@@ -86,6 +87,13 @@ func _build_ui() -> void:
 	_story_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	ThemeService.style_label(_story_label, Tuning.FONT_SIZE_BODY, ThemeService.INK, true)
 	_main_vb.add_child(_story_label)
+
+	# progression calme : une pastille par zone de l'épisode
+	var dots_wrap := CenterContainer.new()
+	_dots = ProgressDots.new()
+	_dots.setup(maxi(_story.get("zones", []).size(), 1))
+	dots_wrap.add_child(_dots)
+	_main_vb.add_child(dots_wrap)
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -193,6 +201,8 @@ func _zone_finished(zone: Dictionary) -> void:
 	var zone_id := str(zone.get("zone_id", ""))
 	if not _zones_done.has(zone_id):
 		_zones_done.append(zone_id)
+	_dots.light_next()
+	Sfx.pair_bell()
 	Telemetry.emit_event("zone_completed", {"zone_id": zone_id, "items_done": _items_done})
 	zone_completed.emit(zone_id)
 	if _active_zone_game != null:

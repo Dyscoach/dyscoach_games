@@ -100,6 +100,7 @@ func _test_session_ceiling() -> void:
 	# simuler l'échéance dépassée
 	game._session_deadline_ms = Time.get_ticks_msec() - 1
 	await get_tree().process_frame
+	await get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0 + 0.3).timeout
 	check(game._finish_requested, "échéance atteinte → fin propre de la séance")
 	game.queue_free()
 

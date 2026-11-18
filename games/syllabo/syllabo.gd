@@ -18,6 +18,9 @@ var _drum: Button = null
 var _train_box: HBoxContainer = null
 var _finish_btn: Button = null
 var _speaker: Button = null
+var _dots: ProgressDots = null
+var _initial_count: int = 0
+var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_syllabo_items(cfg.items)
@@ -65,6 +68,14 @@ func _build_ui() -> void:
 	ThemeService.style_label(instruction, int(Tuning.FONT_SIZE_BODY * 0.8), ThemeService.INK_SOFT)
 	_main_vb.add_child(instruction)
 
+	# progression calme : une pastille par mot de la configuration (réinsertions gardées)
+	var dots_wrap := CenterContainer.new()
+	_dots = ProgressDots.new()
+	_initial_count = maxi(config.items.size(), 1)
+	_dots.setup(_initial_count)
+	dots_wrap.add_child(_dots)
+	_main_vb.add_child(dots_wrap)
+
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
@@ -110,8 +121,15 @@ func on_start() -> void:
 
 func _next_word() -> void:
 	if _queue.is_empty() or _finish_requested:
-		_set_status(Strings.SUMMARY_DONE % _items_done)
-		finish_session("completed")
+		if not _finished:
+			# tous les mots travaillés : bref moment de célébration, jamais de score
+			_finished = true
+			_set_status(Strings.SUCCESS_BRAVO)
+			Sfx.celebration()
+			var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
+			timer.timeout.connect(func() -> void:
+				_set_status(Strings.SUMMARY_DONE % _items_done)
+				finish_session("completed"))
 		return
 	_current = _queue.pop_front()
 	_tapped_count = 0
@@ -230,6 +248,7 @@ func _complete_word() -> void:
 	ThemeService.sparkle_burst(_train_box, _train_box.size * 0.5)
 	if AudioService.mode == AudioService.Mode.LOCAL:
 		AudioService.play_success_chime()
+	_dots.light_next()
 	var timer := get_tree().create_timer(2.0)
 	timer.timeout.connect(_next_word)
 
