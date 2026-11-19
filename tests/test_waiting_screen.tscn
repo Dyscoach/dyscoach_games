@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testwaiting0"]
+
+[ext_resource type="Script" path="res://tests/test_waiting_screen.gd" id="1_tw"]
+
+[node name="TestWaitingScreen" type="Node"]
+script = ExtResource("1_tw")

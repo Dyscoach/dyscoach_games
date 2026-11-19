@@ -14,6 +14,10 @@ const GAMES := {
 }
 
 const FALLBACK_SCENE := "res://games/sandbox/sandbox.tscn"
+## Écran d'attente neutre : en iframe hôte (web), la sandbox de debug n'est
+## JAMAIS montrée à l'enfant — on affiche « Préparation des jeux… » jusqu'à la
+## config (ou l'écran d'erreur calme si la hôte reste silencieuse, contrat v1.1.0).
+const WAITING_SCENE := "res://base/uikit/waiting_screen.tscn"
 
 var _current_game: MiniGame = null
 var _rest_screen: Control = null
@@ -25,7 +29,12 @@ func _ready() -> void:
 	Bridge.stop_requested.connect(_on_stop)
 	# mode dev : aucune configuration en 2 s → config locale selon un jeu de dev ou sandbox
 	Bridge.wait_for_config_or_dev("res://dev/config_sandbox.json")
-	_load_scene(FALLBACK_SCENE)
+	# En iframe hôte (web), l'enfant voit l'écran d'attente neutre — JAMAIS la sandbox
+	# de debug. La sandbox reste le repli de développement local (hors iframe).
+	if Bridge.has_host_parent():
+		_load_scene(WAITING_SCENE)
+	else:
+		_load_scene(FALLBACK_SCENE)
 
 ## Contrat DPP v1.1.0 : la plateforme signale son échec de configuration.
 ## Écran d'erreur calme + Réessayer qui réémet ready (nouveau cycle de vie).
