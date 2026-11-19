@@ -85,6 +85,7 @@ func _test_pair_logic() -> void:
 	check(game._dots != null, "pastilles de progression présentes")
 	check(game._dots._total == 6, "une pastille par paire (6)")
 	check(game._dots._lit == 1, "première pastille allumée après la paire")
+	check(game._buddy != null and game._buddy.mood == Buddy.Mood.HAPPY, "mascotte réagit à la paire trouvée (HAPPY)")
 	# retourner 2 cartes de paires DIFFÉRENTES : se retournent après délai, sans pénalité
 	var d1: MemoCard = null
 	var d2: MemoCard = null
@@ -155,6 +156,16 @@ func _test_homophone_config() -> void:
 						if lbl is Label and lbl.text == Strings.MEMO_SUB:
 							has_subtitle = true
 	check(has_subtitle, "consigne écrite affichée sous le titre")
+	# brique DA : décor univers jardin + mascotte présents, mode non sobre pour 9-11
+	var backdrop_found := false
+	for c in game.get_children():
+		if c is Backdrop:
+			backdrop_found = true
+			check(c.universe == "jardin", "décor jardin appliqué à Mémo-Mots")
+			check(c.sober == false, "mode 9-11 : décor non sobre")
+	check(backdrop_found, "décor Backdrop présent")
+	check(game._buddy != null and game._buddy is Buddy, "mascotte Buddy instanciée")
+	check(game._buddy.mood == Buddy.Mood.IDLE, "mascotte en humeur IDLE au départ")
 	game.queue_free()
 
 func _finish() -> void:

@@ -59,6 +59,11 @@ const MEMO_RETRY := "On retourne les cartes, on regarde bien."
 const MEMO_PAIRES := "paires"
 const MEMO_CELEBRATION := "Toutes les paires sont retrouvées !"
 
+# --- Mascotte (briques partagées Buddy) : bulles courtes, encourageantes, jamais essentielles ---
+const BUDDY_MEMO_FOUND := "Bien vu ! %s !"
+const BUDDY_RETRY := "Presque ! On regarde encore."
+const BUDDY_CELEBRATION := "Bravo, quelle mémoire !"
+
 # --- Syllabo ---
 const SYL_TITLE := "Syllabo"
 const SYL_SUB := "Fais rouler le train des syllabes."
