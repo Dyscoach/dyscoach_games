@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "session_id": "s_forge_dev",
+  "game_id": "forge_mots",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "bulles" },
+  "interaction": { "input": "tap_tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 20, "soft_end_at_minutes": 17 },
+  "difficulty": { "level": 2, "hints": true },
+  "focus": { "source": "ortho", "targets": ["o/au", "an/on"] },
+  "items": [
+    { "item_id": "w_velo", "item_type": "word", "word": "vélo", "graphemes": ["v", "é", "l", "o"], "distractors": [], "syllables": ["vé", "lo"], "audio": { "word": "https://cdn.dyscoach.test/audio/w_velo.mp3", "slow": "https://cdn.dyscoach.test/audio/w_velo_slow.mp3" } },
+    { "item_id": "w_bus", "item_type": "word", "word": "bus", "graphemes": ["b", "u", "s"], "distractors": [], "syllables": ["bus"], "audio": { "word": "https://cdn.dyscoach.test/audio/w_bus.mp3", "slow": "https://cdn.dyscoach.test/audio/w_bus_slow.mp3" } },
+    { "item_id": "w_bateau", "item_type": "word", "word": "bateau", "graphemes": ["b", "a", "t", "eau"], "distractors": ["o", "au"], "syllables": ["ba", "teau"], "audio": { "word": "https://cdn.dyscoach.test/audio/w_bateau.mp3", "slow": "https://cdn.dyscoach.test/audio/w_bateau_slow.mp3" } },
+    { "item_id": "w_ballon", "item_type": "word", "word": "ballon", "graphemes": ["b", "a", "ll", "on"], "distractors": ["d", "an"], "syllables": ["bal", "lon"], "audio": { "word": "https://cdn.dyscoach.test/audio/w_ballon.mp3", "slow": "https://cdn.dyscoach.test/audio/w_ballon_slow.mp3" } },
+    { "item_id": "w_champion", "item_type": "word", "word": "champion", "graphemes": ["ch", "am", "p", "i", "on"], "distractors": ["an", "c", "in"], "syllables": ["cham", "pi", "on"], "audio": { "word": "https://cdn.dyscoach.test/audio/w_champion.mp3", "slow": "https://cdn.dyscoach.test/audio/w_champion_slow.mp3" } },
+    { "item_id": "w_dauphin", "item_type": "word", "word": "dauphin", "graphemes": ["d", "au", "ph", "in"], "distractors": ["o", "f", "an"], "syllables": ["dau", "phin"], "audio": { "word": "https://cdn.dyscoach.test/audio/w_dauphin.mp3", "slow": "https://cdn.dyscoach.test/audio/w_dauphin_slow.mp3" } },
+    { "item_id": "h_chien", "item_type": "homophone", "sentence_before": "Il", "sentence_after": "un chien", "choices": ["a", "à"], "answer": "a", "audio": { "sentence": "https://cdn.dyscoach.test/audio/h_chien.mp3" } }
+  ],
+  "collection_state": null
+}

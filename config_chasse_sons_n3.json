@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "session_id": "s_chasse_l3",
+  "game_id": "chasse_sons",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "oeufs" },
+  "interaction": { "input": "tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 20, "soft_end_at_minutes": 17 },
+  "difficulty": { "level": 3, "hints": true },
+  "focus": { "source": "ortho", "targets": ["/b/"] },
+  "target": {
+    "phoneme_id": "ph_b",
+    "label": "b",
+    "audio_phoneme": "https://cdn.dyscoach.test/audio/ph_b.mp3"
+  },
+  "rounds": 2,
+  "items": [
+    { "item_id": "i_cabane", "word": "cabane", "image_id": "img_cabane", "has_target": true, "position": "middle", "audio": { "word": "https://cdn.dyscoach.test/audio/i_cabane.mp3" } },
+    { "item_id": "i_robe", "word": "robe", "image_id": "img_robe", "has_target": true, "position": "end", "audio": { "word": "https://cdn.dyscoach.test/audio/i_robe.mp3" } },
+    { "item_id": "i_lapin", "word": "lapin", "image_id": "img_lapin", "has_target": false, "position": "start", "audio": { "word": "https://cdn.dyscoach.test/audio/i_lapin.mp3" } },
+    { "item_id": "i_tomate", "word": "tomate", "image_id": "img_tomate", "has_target": false, "position": "end", "audio": { "word": "https://cdn.dyscoach.test/audio/i_tomate.mp3" } },
+    { "item_id": "i_soleil", "word": "soleil", "image_id": "img_soleil", "has_target": false, "position": "end", "audio": { "word": "https://cdn.dyscoach.test/audio/i_soleil.mp3" } }
+  ],
+  "collection_state": null
+}

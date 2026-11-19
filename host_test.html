@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>DysCoach — hôte de test des jeux</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: #F8F7FF; color: #1a1b2e; }
+  header { padding: 12px 20px; background: #3752ed; color: #fff; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; flex: 1; }
+  header label { font-size: 14px; }
+  header select, header button { font-size: 14px; padding: 6px 12px; border-radius: 8px; border: 1px solid #c7c9e0; }
+  header button { background: #fff; cursor: pointer; }
+  #frame-wrap { display: flex; justify-content: center; padding: 12px; }
+  iframe { width: min(540px, 95vw); height: min(920px, 92vh); border: 2px solid #c7c9e0; border-radius: 16px; background: #fff; }
+  #events { max-height: 220px; overflow: auto; background: #fff; border-top: 1px solid #c7c9e0; padding: 8px 20px 20px; font-family: ui-monospace, monospace; font-size: 12px; }
+  #events div { padding: 2px 0; border-bottom: 1px dashed #e6e6f5; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<header>
+  <h1>DysCoach — hôte de test</h1>
+  <label>Config :
+    <select id="config-select"></select>
+  </label>
+  <button id="send-btn">Envoyer</button>
+  <button id="pause-btn">Pause</button>
+  <button id="resume-btn">Reprise</button>
+  <button id="stop-btn">Stop</button>
+</header>
+<div id="frame-wrap">
+  <!-- Pas d'attribut sandbox : une iframe sandboxée sans allow-same-origin a une
+     origine opaque ("null") que le pont du jeu rejette (origin_check du DPP). -->
+  <iframe id="game-frame" title="Jeu DysCoach"></iframe>
+</div>
+<div id="events"><b>Événements reçus :</b></div>
+<script>
+"use strict";
+const CONFIGS = {
+  "sandbox (dev)": "config_sandbox.json",
+  "forge_mots (dev)": "config_forge_mots.json",
+  "forge_mots (invalide)": "config_forge_mots_invalide.json",
+  "chasse_sons (dev)": "config_chasse_sons.json",
+  "duo_mots (dev)": "config_duo_mots.json",
+  "memo_mots (dev)": "config_memo_mots.json",
+  "syllabo (dev)": "config_syllabo.json",
+  "radar_lettres (dev)": "config_radar_lettres.json",
+  "sonimaux (dev)": "config_sonimaux.json",
+  "sonimaux (histoire non filtrée)": "config_sonimaux_unsafe.json",
+};
+const frame = document.getElementById("game-frame");
+const select = document.getElementById("config-select");
+const eventsBox = document.getElementById("events");
+const audioCache = new Map();
+let gameOrigin = window.location.origin;
+let latestConfig = null;
+
+for (const key of Object.keys(CONFIGS)) {
+  const opt = document.createElement("option");
+  opt.value = CONFIGS[key];
+  opt.textContent = key;
+  select.appendChild(opt);
+}
+
+function logEvent(text) {
+  const row = document.createElement("div");
+  row.textContent = new Date().toLocaleTimeString() + " — " + text;
+  eventsBox.appendChild(row);
+  eventsBox.scrollTop = eventsBox.scrollHeight;
+}
+
+async function loadConfig(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+
+// Déverrouillage de l'audio au premier geste (règles des navigateurs mobiles)
+let audioUnlocked = false;
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  ctx.resume().then(() => logEvent("AudioContext déverrouillé"));
+  document.removeEventListener("pointerdown", unlockAudio);
+}
+document.addEventListener("pointerdown", unlockAudio);
+
+function playAudio(id, url, kind) {
+  if (audioCache.has(id)) { audioCache.get(id).pause(); }
+  const audio = new Audio(url);
+  audioCache.set(id, audio);
+  audio.addEventListener("ended", () => {
+    post({ type: "audio_ended", id });
+    logEvent("audio_ended " + id + " (" + kind + ")");
+  });
+  audio.addEventListener("error", () => {
+    post({ type: "audio_ended", id });
+    logEvent("audio ERREUR " + id + " url=" + url);
+  });
+  audio.play().catch((e) => {
+    logEvent("audio play refusé (" + e.message + ") — clic requis d'abord");
+    post({ type: "audio_ended", id });
+  });
+}
+
+function stopAudio() {
+  for (const audio of audioCache.values()) audio.pause();
+  audioCache.clear();
+}
+
+function post(msg) {
+  // Invariant string_envelope (contrat v1.1.0) : le pont Godot ne parse que des strings.
+  frame.contentWindow.postMessage(JSON.stringify(msg), gameOrigin);
+}
+
+window.addEventListener("message", (ev) => {
+  if (ev.origin !== gameOrigin) { logEvent("Origine refusée : " + ev.origin); return; }
+  let msg = ev.data;
+  if (typeof msg === "string") { try { msg = JSON.parse(msg); } catch { logEvent("JSON invalide"); return; } }
+  switch (msg.type) {
+    case "ready":
+      logEvent("ready v" + msg.version);
+      sendConfig();
+      break;
+    case "play_audio":
+      logEvent("play_audio " + msg.id + " " + msg.kind + " " + msg.url);
+      playAudio(msg.id, msg.url, msg.kind);
+      break;
+    case "stop_audio":
+      stopAudio();
+      break;
+    case "event":
+      logEvent("event " + msg.name + " seq=" + msg.seq + " " + JSON.stringify(msg.data));
+      break;
+    case "session_end":
+      logEvent("session_end " + JSON.stringify(msg.data));
+      break;
+    case "error":
+      logEvent("error " + JSON.stringify(msg.data));
+      break;
+    default:
+      logEvent("message " + JSON.stringify(msg));
+  }
+});
+
+async function sendConfig() {
+  const url = select.value;
+  latestConfig = await loadConfig(url);
+  post({ type: "config", payload: latestConfig });
+  logEvent("config envoyée : " + url);
+}
+
+document.getElementById("send-btn").addEventListener("click", () => {
+  frame.contentWindow.location.reload();
+  setTimeout(sendConfig, 1200);
+});
+document.getElementById("pause-btn").addEventListener("click", () => post({ type: "pause" }));
+document.getElementById("resume-btn").addEventListener("click", () => post({ type: "resume" }));
+document.getElementById("stop-btn").addEventListener("click", () => post({ type: "stop" }));
+
+frame.src = new URL("index.html", document.baseURI).href;
+</script>
+</body>
+</html>

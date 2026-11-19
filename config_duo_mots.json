@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "session_id": "s_duo_dev",
+  "game_id": "duo_mots",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "bulles" },
+  "interaction": { "input": "tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 20, "soft_end_at_minutes": 17 },
+  "difficulty": { "level": 1, "hints": true },
+  "focus": { "source": "ortho", "targets": ["chat/rat", "poule/boule"] },
+  "items": [
+    { "item_id": "p_chat_rat", "pair_id": "pair_chat_rat", "contrast_label": "ch/r",
+      "cards": [
+        { "word": "chat", "image_id": "img_chat", "audio": { "word": "https://cdn.dyscoach.test/audio/m_chat.mp3", "slow": "https://cdn.dyscoach.test/audio/m_chat_slow.mp3" } },
+        { "word": "rat", "image_id": "img_rat", "audio": { "word": "https://cdn.dyscoach.test/audio/m_rat.mp3", "slow": "https://cdn.dyscoach.test/audio/m_rat_slow.mp3" } }
+      ], "target_index": 0, "order": [0, 1] },
+    { "item_id": "p_poule_boule", "pair_id": "pair_poule_boule", "contrast_label": "p/b",
+      "cards": [
+        { "word": "poule", "image_id": "img_poule", "audio": { "word": "https://cdn.dyscoach.test/audio/m_poule.mp3", "slow": "https://cdn.dyscoach.test/audio/m_poule_slow.mp3" } },
+        { "word": "boule", "image_id": "img_boule", "audio": { "word": "https://cdn.dyscoach.test/audio/m_boule.mp3", "slow": "https://cdn.dyscoach.test/audio/m_boule_slow.mp3" } }
+      ], "target_index": 1, "order": [0, 1] },
+    { "item_id": "p_pain_bain", "pair_id": "pair_pain_bain", "contrast_label": "p/b",
+      "cards": [
+        { "word": "pain", "image_id": "img_pain", "audio": { "word": "https://cdn.dyscoach.test/audio/m_pain.mp3", "slow": "https://cdn.dyscoach.test/audio/m_pain_slow.mp3" } },
+        { "word": "bain", "image_id": "img_bain", "audio": { "word": "https://cdn.dyscoach.test/audio/m_bain.mp3", "slow": "https://cdn.dyscoach.test/audio/m_bain_slow.mp3" } }
+      ], "target_index": 0, "order": [0, 1] },
+    { "item_id": "p_mer_ver", "pair_id": "pair_mer_ver", "contrast_label": "m/v",
+      "cards": [
+        { "word": "mer", "image_id": "img_mer", "audio": { "word": "https://cdn.dyscoach.test/audio/m_mer.mp3", "slow": "https://cdn.dyscoach.test/audio/m_mer_slow.mp3" } },
+        { "word": "ver", "image_id": "img_ver", "audio": { "word": "https://cdn.dyscoach.test/audio/m_ver.mp3", "slow": "https://cdn.dyscoach.test/audio/m_ver_slow.mp3" } }
+      ], "target_index": 0, "order": [0, 1] },
+    { "item_id": "p_mouton_bouton", "pair_id": "pair_mouton_bouton", "contrast_label": "m/b",
+      "cards": [
+        { "word": "mouton", "image_id": "img_mouton", "audio": { "word": "https://cdn.dyscoach.test/audio/m_mouton.mp3", "slow": "https://cdn.dyscoach.test/audio/m_mouton_slow.mp3" } },
+        { "word": "bouton", "image_id": "", "audio": { "word": "https://cdn.dyscoach.test/audio/m_bouton.mp3", "slow": "https://cdn.dyscoach.test/audio/m_bouton_slow.mp3" } }
+      ], "target_index": 1, "order": [0, 1] },
+    { "item_id": "p_lit_riz", "pair_id": "pair_lit_riz", "contrast_label": "t/z",
+      "cards": [
+        { "word": "lit", "image_id": "img_lit", "audio": { "word": "https://cdn.dyscoach.test/audio/m_lit.mp3", "slow": "https://cdn.dyscoach.test/audio/m_lit_slow.mp3" } },
+        { "word": "riz", "image_id": "img_riz", "audio": { "word": "https://cdn.dyscoach.test/audio/m_riz.mp3", "slow": "https://cdn.dyscoach.test/audio/m_riz_slow.mp3" } }
+      ], "target_index": 0, "order": [1, 0] }
+  ],
+  "collection_state": null
+}

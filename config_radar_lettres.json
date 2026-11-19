@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "session_id": "s_radar_dev",
+  "game_id": "radar_lettres",
+  "locale": "fr-FR",
+  "age_band": "9-11",
+  "display_name": "",
+  "theme": { "id": "default", "skin": "bulles" },
+  "interaction": { "input": "tap", "validation": "per_item" },
+  "a11y": { "reduce_motion": false, "music": true, "show_time_digits": false },
+  "session_limits": { "max_active_minutes": 2, "soft_end_at_minutes": 1.8 },
+  "difficulty": { "level": 2, "hints": true },
+  "focus": { "source": "ortho", "targets": ["b/d/p/q"] },
+  "items": [
+    { "item_id": "r_b", "target": "b", "distractors": ["d", "p", "q"], "anchor_word": "bateau",
+      "grid": ["b", "d", "p", "b", "q", "d", "b", "p", "d"], "target_count": 3,
+      "audio": { "sound": "https://cdn.dyscoach.test/audio/ph_b.mp3", "anchor": "https://cdn.dyscoach.test/audio/r_bateau.mp3" } },
+    { "item_id": "r_on", "target": "on", "distractors": ["ou", "an", "in"], "anchor_word": "wagon",
+      "grid": ["on", "ou", "an", "in", "on", "ou", "an", "in", "ou", "an", "on", "in"], "target_count": 3,
+      "audio": { "sound": "https://cdn.dyscoach.test/audio/ph_on.mp3", "anchor": "https://cdn.dyscoach.test/audio/r_wagon.mp3" } }
+  ],
+  "collection_state": null
+}
