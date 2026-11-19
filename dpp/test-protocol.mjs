@@ -53,6 +53,7 @@ const hostSrc = readFileSync(new URL("./host/dyscoach-host.js", import.meta.url)
 check(hostSrc.includes("sendConfigError"), "hôte : sendConfigError défini");
 check(hostSrc.includes(".catch((err) => this.sendConfigError"), "hôte : échec du configProvider signalé au jeu (pas de silence)");
 check(hostSrc.includes("config_error"), "hôte : message config_error émis");
+check(hostSrc.includes("win.postMessage(JSON.stringify(msg)"), "hôte : invariant string_envelope (messages sérialisés en JSON string)");
 const ok = validateConfig({ schema_version: 1, session_id: "s1", game_id: "forge_mots", age_band: "9-11", session_limits: { max_active_minutes: 20 }, items: [{}] });
 check(ok.valid, "validateConfig accepte une config valide");
 const bad = validateConfig({ schema_version: 3, age_band: "99-99" });

@@ -149,7 +149,10 @@ export class DyscoachHost {
       this._log.push({ dir: "dropped", type: msg.type, msg, at: Date.now() - this._startedAt });
       return;
     }
-    win.postMessage(msg, this.gameOrigin);
+    // Invariant string_envelope (contrat v1.1.0) : les messages hôte → jeu partent
+    // SÉRALISÉS en JSON string — le pont Godot ne parse que des strings (un objet
+    // posté tel quel n'est jamais converti en Dictionary côté moteur : ignoré).
+    win.postMessage(JSON.stringify(msg), this.gameOrigin);
     this._log.push({ dir: "out", type: msg.type, msg, at: Date.now() - this._startedAt });
   }
 

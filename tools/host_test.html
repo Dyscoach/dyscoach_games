@@ -110,7 +110,8 @@ function stopAudio() {
 }
 
 function post(msg) {
-  frame.contentWindow.postMessage(msg, gameOrigin);
+  // Invariant string_envelope (contrat v1.1.0) : le pont Godot ne parse que des strings.
+  frame.contentWindow.postMessage(JSON.stringify(msg), gameOrigin);
 }
 
 window.addEventListener("message", (ev) => {
