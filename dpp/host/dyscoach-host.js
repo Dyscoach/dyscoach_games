@@ -120,7 +120,14 @@ export class DyscoachHost {
 
   _post(msg) {
     const win = this.iframe.contentWindow;
-    if (!win || !this.gameOrigin) throw new Error("DyscoachHost._post : jeu non chargé");
+    if (!win || !this.gameOrigin) {
+      // L'iframe peut être démontée (sortie du mode jeu) pendant qu'un timer
+      // audio ou un visibilitychange déclenche encore pause/resume/stop :
+      // environnement mort, on jette proprement le message au lieu de crasher
+      // la page hôte (« jeu non chargé » inutile hors débogage).
+      this._log.push({ dir: "dropped", type: msg.type, msg, at: Date.now() - this._startedAt });
+      return;
+    }
     win.postMessage(msg, this.gameOrigin);
     this._log.push({ dir: "out", type: msg.type, msg, at: Date.now() - this._startedAt });
   }
@@ -166,10 +173,11 @@ export class DyscoachHost {
   // --- visibilité : pause automatique (le temps actif ne compte pas en onglet caché) ---
 
   _bindVisibility() {
-    document.addEventListener("visibilitychange", () => {
+    this._visibilityHandler = () => {
       if (document.hidden) this.pause();
       else this.resume();
-    });
+    };
+    document.addEventListener("visibilitychange", this._visibilityHandler);
   }
 
   // --- débogage ---
@@ -179,7 +187,14 @@ export class DyscoachHost {
 
   destroy() {
     window.removeEventListener("message", this._handler);
+    if (this._visibilityHandler) {
+      document.removeEventListener("visibilitychange", this._visibilityHandler);
+      this._visibilityHandler = null;
+    }
     this._stopAllAudio();
+    // L'iframe va être démontée : plus aucun message ne doit partir après destroy.
+    this.gameOrigin = "";
+    this._configSent = true;
   }
 }
 
