@@ -1,6 +1,6 @@
 {
   "protocol_name": "dyscoach-play",
-  "protocol_version": "1.0.0",
+  "protocol_version": "1.1.0",
   "description": "Contrat d'interface entre la plateforme dyscoach.com (hôte) et les jeux Godot (invités) via iframe + postMessage.",
   "invariants": {
     "no_personal_data": "Aucune donnée personnelle dans les messages : ni prénom, ni texte libre.",
@@ -8,7 +8,9 @@
     "stateless_game": "Le jeu ne stocke rien ; la plateforme possède toutes les données.",
     "tolerant_reader": "Un message de type inconnu et un champ inconnu sont ignorés, jamais fataux.",
     "one_session_end": "Exactement un message session_end par session.",
-    "no_forbidden_words": "Aucun texte du jeu n'emploie faux, raté, perdu, nul, thérapie, soin, rééducation."
+    "no_forbidden_words": "Aucun texte du jeu n'emploie faux, raté, perdu, nul, thérapie, soin, rééducation.",
+    "no_silent_host": "L'hôte répond toujours à ready par config ou config_error ; un échec de configuration n'est jamais avalé silencieusement (le jeu doit pouvoir afficher Réessayer).",
+    "string_envelope": "postMessage transporte le message SÉRALISÉ en JSON string ; le récepteur parse une string JSON (les deux implémentations l'acceptent, la string est la forme canonique)."
   },
   "envelope": {
     "type": "string (voir messages)",
@@ -19,38 +21,102 @@
     "config": {
       "payload": "Configuration complète de la partie (voir schema_config)",
       "when": "À la réception de ready ; rejouable pour redémarrer la session",
-      "required": ["schema_version", "session_id", "game_id", "locale", "age_band", "session_limits", "items"],
+      "required": [
+        "schema_version",
+        "session_id",
+        "game_id",
+        "locale",
+        "age_band",
+        "session_limits",
+        "items"
+      ],
       "schema_config": {
         "schema_version": 1,
         "session_id": "string opaque",
         "game_id": "forge_mots | chasse_sons | duo_mots | memo_mots | syllabo | radar_lettres | sonimaux",
         "locale": "fr-FR",
-        "age_band": ["6-8", "9-11", "12-14", "15-16"],
+        "age_band": [
+          "6-8",
+          "9-11",
+          "12-14",
+          "15-16"
+        ],
         "display_name": "string, optionnel, jamais journalisé par le jeu",
-        "theme": { "id": "string", "skin": "bulles | oeufs" },
-        "interaction": { "input": "tap | drag | tap_tap", "validation": "per_item | at_end" },
-        "a11y": { "reduce_motion": "bool", "music": "bool", "show_time_digits": "bool" },
-        "session_limits": { "max_active_minutes": "nombre ≤ 30", "soft_end_at_minutes": "nombre" },
-        "difficulty": { "level": "entier ≥ 1", "hints": "bool" },
-        "focus": { "source": "ortho", "targets": ["string"] },
+        "theme": {
+          "id": "string",
+          "skin": "bulles | oeufs"
+        },
+        "interaction": {
+          "input": "tap | drag | tap_tap",
+          "validation": "per_item | at_end"
+        },
+        "a11y": {
+          "reduce_motion": "bool",
+          "music": "bool",
+          "show_time_digits": "bool"
+        },
+        "session_limits": {
+          "max_active_minutes": "nombre ≤ 30",
+          "soft_end_at_minutes": "nombre"
+        },
+        "difficulty": {
+          "level": "entier ≥ 1",
+          "hints": "bool"
+        },
+        "focus": {
+          "source": "ortho",
+          "targets": [
+            "string"
+          ]
+        },
         "items": "tableau d'items validés par le validateur du game_id (GameConfig.validate_*_items)",
         "collection_state": "objet, sonimaux uniquement (creatures, cosmetics, pending_animations)"
       }
     },
-    "pause": { "payload": null, "when": "Onglet masqué ou bouton parent" },
-    "resume": { "payload": null },
-    "audio_ended": { "payload": { "id": "string" } },
-    "stop": { "payload": null, "when": "Fin immédiate propre ; le jeu répond session_end reason=stopped" }
+    "pause": {
+      "payload": null,
+      "when": "Onglet masqué ou bouton parent"
+    },
+    "resume": {
+      "payload": null
+    },
+    "audio_ended": {
+      "payload": {
+        "id": "string"
+      }
+    },
+    "stop": {
+      "payload": null,
+      "when": "Fin immédiate propre ; le jeu répond session_end reason=stopped"
+    },
+    "config_error": {
+      "payload": {
+        "code": "string (config_provider_failed | config_invalid_host_side)",
+        "retry": "bool — le jeu PEUT réémettre ready pour redemander une config"
+      },
+      "when": "La plateforme n'a pas pu produire ni envoyer la configuration (provider en échec, config invalide avant envoi). Le jeu affiche l'écran d'erreur calme (ErrorScreen) au lieu d'attendre indéfiniment ; si retry=true, le bouton Réessayer réémet ready (re-synchronisation du cycle de vie).",
+      "note": "Complète le cycle de vie : chaque ready reçoit exactement une réponse, config OU config_error — jamais le silence.",
+      "version_added": "1.1.0"
+    }
   },
   "messages_game_to_host": {
     "ready": {
-      "payload": { "version": "string semver", "protocol": 1 },
+      "payload": {
+        "version": "string semver",
+        "protocol": 1
+      },
       "note": "Porteur vide ; seul message pouvant partir sans restriction d'origine (iframe sandboxée)"
     },
     "play_audio": {
-      "payload": { "id": "string", "url": "https URL du fichier audio préfabriqué", "kind": "prompt | word | feedback" }
+      "payload": {
+        "id": "string",
+        "url": "https URL du fichier audio préfabriqué",
+        "kind": "prompt | word | feedback"
+      }
     },
-    "stop_audio": { "payload": null },
+    "stop_audio": {
+      "payload": null
+    },
     "event": {
       "payload": {
         "name": "voir catalogue events",
@@ -58,39 +124,118 @@
       }
     },
     "session_end": {
-      "payload": { "reason": "completed | time_limit | stopped | error", "active_ms": "entier", "items_done": "entier" }
+      "payload": {
+        "reason": "completed | time_limit | stopped | error",
+        "active_ms": "entier",
+        "items_done": "entier"
+      }
     },
     "error": {
-      "payload": { "code": "voir catalogue errors", "message": "string technique, jamais montrée à l'enfant" }
+      "payload": {
+        "code": "voir catalogue errors",
+        "message": "string technique, jamais montrée à l'enfant"
+      }
     }
   },
   "event_names": {
     "common": {
-      "session_started": { "game_id": "string", "age_band": "string", "level": "entier" },
-      "item_presented": { "item_id": "string" },
-      "item_answered": { "item_id": "string", "attempt_no": "entier", "correct": "bool", "response_ms": "entier", "detail": "voir catalogues par jeu" },
-      "item_completed": { "item_id": "string", "first_try": "bool", "attempts": "entier", "hints": "entier" },
-      "hint_shown": { "item_id": "string", "hint_type": "tile_glow | spell_out" },
-      "audio_replayed": { "item_id": "string" },
-      "break_started": { "reason": "round_end | soft_end" },
-      "session_ended": { "reason": "string", "active_ms": "entier", "items_done": "entier" }
+      "session_started": {
+        "game_id": "string",
+        "age_band": "string",
+        "level": "entier"
+      },
+      "item_presented": {
+        "item_id": "string"
+      },
+      "item_answered": {
+        "item_id": "string",
+        "attempt_no": "entier",
+        "correct": "bool",
+        "response_ms": "entier",
+        "detail": "voir catalogues par jeu"
+      },
+      "item_completed": {
+        "item_id": "string",
+        "first_try": "bool",
+        "attempts": "entier",
+        "hints": "entier"
+      },
+      "hint_shown": {
+        "item_id": "string",
+        "hint_type": "tile_glow | spell_out"
+      },
+      "audio_replayed": {
+        "item_id": "string"
+      },
+      "break_started": {
+        "reason": "round_end | soft_end"
+      },
+      "session_ended": {
+        "reason": "string",
+        "active_ms": "entier",
+        "items_done": "entier"
+      }
     },
     "sonimaux": {
-      "episode_started": { "episode_id": "string" },
-      "zone_started": { "zone_id": "string", "game_id": "string" },
-      "zone_completed": { "zone_id": "string", "items_done": "entier" },
+      "episode_started": {
+        "episode_id": "string"
+      },
+      "zone_started": {
+        "zone_id": "string",
+        "game_id": "string"
+      },
+      "zone_completed": {
+        "zone_id": "string",
+        "items_done": "entier"
+      },
       "carnet_opened": {},
-      "episode_ended": { "reason": "completed | time_limit", "zones_done": ["string"] },
-      "creature_evolved": { "creature_id": "string", "from_stage": "entier", "to_stage": "entier" }
+      "episode_ended": {
+        "reason": "completed | time_limit",
+        "zones_done": [
+          "string"
+        ]
+      },
+      "creature_evolved": {
+        "creature_id": "string",
+        "from_stage": "entier",
+        "to_stage": "entier"
+      }
     }
   },
   "item_answered_detail_by_game": {
-    "forge_mots": { "expected": "string", "chosen": "string", "tile_pair": "string vide ou an/on", "mode": "tile | word | homophone" },
-    "chasse_sons": { "phoneme_id": "string", "has_target": "bool", "tapped_target": "bool", "position": "start | middle | end" },
-    "duo_mots": { "pair_id": "string", "chosen_word": "string", "expected_word": "string", "contrast_label": "string" },
-    "memo_mots": { "pair_id": "string", "kind": "word_image | homophone", "flips_to_match": "entier" },
-    "syllabo": { "expected_count": "entier", "tapped_count": "entier", "auto_validated": "bool" },
-    "radar_lettres": { "target": "string", "tapped": "string", "was_target": "bool" }
+    "forge_mots": {
+      "expected": "string",
+      "chosen": "string",
+      "tile_pair": "string vide ou an/on",
+      "mode": "tile | word | homophone"
+    },
+    "chasse_sons": {
+      "phoneme_id": "string",
+      "has_target": "bool",
+      "tapped_target": "bool",
+      "position": "start | middle | end"
+    },
+    "duo_mots": {
+      "pair_id": "string",
+      "chosen_word": "string",
+      "expected_word": "string",
+      "contrast_label": "string"
+    },
+    "memo_mots": {
+      "pair_id": "string",
+      "kind": "word_image | homophone",
+      "flips_to_match": "entier"
+    },
+    "syllabo": {
+      "expected_count": "entier",
+      "tapped_count": "entier",
+      "auto_validated": "bool"
+    },
+    "radar_lettres": {
+      "target": "string",
+      "tapped": "string",
+      "was_target": "bool"
+    }
   },
   "error_codes": {
     "audio_missing": "Un audio de consigne est indisponible ; le jeu continue.",
@@ -104,16 +249,35 @@
     "origin_rejected": "Comptage interne d'un message d'origine non autorisée (aucune donnée d'origine transmise)."
   },
   "lifecycle": {
-    "order": ["ready", "config", "event(session_started)", "...", "event(session_ended)", "session_end"],
+    "order": [
+      "ready",
+      "config | config_error",
+      "event(session_started)",
+      "...",
+      "event(session_ended)",
+      "session_end"
+    ],
     "guarantees": [
+      "Chaque ready reçoit exactement une réponse : config OU config_error — jamais le silence (l'échec de configuration est TOUJOURS signalé au jeu).",
       "Le jeu continue sans planter si un audio manque.",
       "Le temps actif exclut les pauses et les périodes sans interaction de 30 s.",
-      "Le plafond quotidien est contrôlé par la plateforme AVANT de lancer une partie."
-    ]
+      "Le plafond quotidien est contrôlé par la plateforme AVANT de lancer une partie.",
+      "Le repli dev (fichier local) n'existe qu'en exécution locale HORS iframe hôte : il ne doit JAMAIS se déclencher en production (voir contract_gap_notes)."
+    ],
+    "host_config_timeout_ms": 8000,
+    "host_config_timeout_note": "Délai max conseillé entre ready et config|config_error ; au-delà, sans réponse, le jeu affiche l'écran d'erreur calme (toujours récupérable par un nouveau ready)."
   },
   "versioning": {
     "policy": "semver",
     "minor": "nouveau message ou nouveau champ optionnel (toléré par les implémentations anciennes)",
     "major": "champ retiré ou sémantique modifiée (les jeux anciens ne doivent pas être cassés)"
+  },
+  "contract_gap_notes": {
+    "incident_2026_11": "Jeux bloqués sur « Socle — bac à sable » / « En attente de la configuration » : (1) configProvider en échec sans .catch() côté hôte → jeu jamais informé ; (2) repli dev config_sandbox.json embarqué dans le PCK de production → sandbox rechargée en boucle d'attente ; (3) host_test.html en iframe sandbox allow-scripts → origine opaque null rejetée par origin_check du jeu.",
+    "fixes_1_1_0": [
+      "Message config_error hôte→jeu + cycle de vie « chaque ready reçoit une réponse ».",
+      "Le repli dev ne se déclenche que si le moteur tourne SANS parent hôte (window.parent === window) ; en iframe hôte, un ready sans réponse après HOST_CONFIG_TIMEOUT_MS affiche l'écran d'erreur.",
+      "host_test.html : iframe SANS attribut sandbox (le hôte de test est servi same-origin, pas d'origine opaque)."
+    ]
   }
 }

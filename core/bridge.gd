@@ -6,6 +6,7 @@ extends Node
 ## envoi ciblé sur l'origine hôte (jamais "*"), JSON construit par JSON.stringify.
 
 signal config_received(payload: Dictionary)
+signal config_error_received(code: String, retry: bool)
 signal pause_requested
 signal resume_requested
 signal audio_ended(id: String)
@@ -13,6 +14,9 @@ signal stop_requested
 
 const VERSION := "1.0.0"
 const CONFIG_TIMEOUT_MS := 2000
+# Contrat DPP v1.1.0 : au-delà de ce délai après ready SANS config ni config_error
+# en iframe hôte, le jeu affiche l'écran d'erreur (l'hôte ne reste jamais silencieux).
+const HOST_CONFIG_TIMEOUT_MS := 8000
 
 var _allowed_origins: Array = []
 var _host_origin: String = ""
@@ -22,10 +26,12 @@ var _message_queue: Array = []
 var _in_web: bool = false
 var _ready_sent: bool = false
 var _last_config_ms: int = 0
+var _has_host_parent: bool = false
 
 func _ready() -> void:
 	_allowed_origins = _load_allowed_origins()
 	_in_web = OS.has_feature("web")
+	_has_host_parent = _detect_host_parent()
 	if _in_web:
 		_setup_js()
 
@@ -99,6 +105,13 @@ func _handle_message(msg: Dictionary, origin: String = "") -> void:
 			if typeof(payload) == TYPE_DICTIONARY:
 				_last_config_ms = Time.get_ticks_msec()
 				config_received.emit(payload)
+		"config_error":
+			# Contrat v1.1.0 : la plateforme n'a pas pu produire la config.
+			var data: Dictionary = msg.get("data", {}) if typeof(msg.get("data", {})) == TYPE_DICTIONARY else {}
+			var code := str(data.get("code", "config_provider_failed"))
+			var retry := bool(data.get("retry", true))
+			_last_config_ms = Time.get_ticks_msec()
+			config_error_received.emit(code, retry)
 		"pause":
 			pause_requested.emit()
 		"resume":
@@ -146,6 +159,20 @@ func send_ready() -> void:
 	_ready_sent = true
 	_post({"type": "ready", "version": VERSION})
 
+## Contrat v1.1.0 : réémettre ready (bouton Réessayer après config_error).
+func resend_ready() -> void:
+	_ready_sent = false
+	send_ready()
+
+func has_host_parent() -> bool:
+	return _has_host_parent
+
+func _detect_host_parent() -> bool:
+	if not _in_web:
+		return false
+	var res = JavaScriptBridge.eval("(function(){ try { return window.parent !== window; } catch(e) { return false; } })()", true)
+	return bool(res) if res != null else false
+
 func send_play_audio(id: String, url: String, kind: String) -> void:
 	_post({"type": "play_audio", "id": id, "url": url, "kind": kind})
 
@@ -171,9 +198,17 @@ func send_session_end(reason: String, active_ms: int, items_done: int) -> void:
 func send_error(code: String, message: String) -> void:
 	_post({"type": "error", "data": {"code": code, "message": message}})
 
-# --- Mode développement : aucune config reçue à temps → config locale ---
+# --- Mode développement : repli fichier local UNIQUEMENT sans hôte ---
 
 func wait_for_config_or_dev(dev_path: String) -> void:
+	# Contrat v1.1.0 : en iframe hôte, JAMAIS de repli local — on attend
+	# config ou config_error ; sans réponse au bout de HOST_CONFIG_TIMEOUT_MS,
+	# l'écran d'erreur calme s'affiche (récupérable par un nouveau ready).
+	# Le repli dev ne se déclenche qu'en exécution locale autonome
+	# (window.parent === window), typiquement l'export web ouvert directement.
+	if _has_host_parent:
+		await _watch_host_silent(HOST_CONFIG_TIMEOUT_MS / 1000.0)
+		return
 	await get_tree().create_timer(CONFIG_TIMEOUT_MS / 1000.0).timeout
 	if _last_config_ms > 0:
 		return  # une configuration (hôte) est arrivée : pas de repli dev
@@ -186,7 +221,19 @@ func wait_for_config_or_dev(dev_path: String) -> void:
 		_host_origin = _detect_host_origin()
 		config_received.emit(parsed)
 
+## Watchdog contrat v1.1.0 : sans config ni config_error après le délai donné,
+## le jeu signale lui-même l'hôte silencieux (écran d'erreur, récupérable).
+func _watch_host_silent(timeout_s: float) -> void:
+	await get_tree().create_timer(timeout_s).timeout
+	if _last_config_ms > 0:
+		return  # config ou config_error reçue : cycle de vie respecté
+	config_error_received.emit("host_silent", true)
+
 ## Repli utilisé par les tests : charge directement une config sans passer par le délai de 2 s.
+## Tests : simule un message hôte entrant (comme la réception postMessage).
+func emit_host_message(msg: Dictionary) -> void:
+	_message_queue.append([msg, _allowed_origins[0] if not _allowed_origins.is_empty() else ""])
+
 func emit_config_now(payload: Dictionary) -> void:
 	_last_config_ms = Time.get_ticks_msec()
 	_handle_message({"type": "config", "payload": payload}, "")

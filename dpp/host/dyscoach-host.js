@@ -65,7 +65,11 @@ export class DyscoachHost {
 
   sendConfig(config) {
     if (!config || config.schema_version !== 1) {
-      throw new Error("DyscoachHost.sendConfig : configuration invalide (schema_version != 1)");
+      // Contrat v1.1.0 : config invalide côté hôte → config_error (jamais de throw
+      // silencieux dans la chaîne du configProvider, jamais de silence côté jeu).
+      this.sendConfigError("config_invalid_host_side", true,
+        new Error("DyscoachHost.sendConfig : configuration invalide (schema_version != 1)"));
+      return;
     }
     this._post({ type: "config", payload: config });
     this._configSent = true;
@@ -75,6 +79,16 @@ export class DyscoachHost {
   resume() { this._post({ type: "resume" }); }
   stop() { this._post({ type: "stop" }); }
   stopAudio() { this._stopAllAudio(); this._post({ type: "stop_audio" }); }
+
+  /**
+   * Contrat v1.1.0 : signale au jeu que la configuration n'a pas pu être
+   * produite — remplace le silence. retry=true → le bouton Réessayer du jeu
+   * réémet ready et relance le cycle configProvider.
+   */
+  sendConfigError(code, retry, cause) {
+    this.onError(code, cause ? String(cause && cause.message || cause) : "");
+    this._post({ type: "config_error", data: { code, retry: !!retry } });
+  }
 
   // --- réception jeu → hôte ---
 
@@ -93,8 +107,15 @@ export class DyscoachHost {
     switch (msg.type) {
       case "ready":
         this._ready = true;
+        // Un re-ready (iframe rechargée) redémarre le cycle : le nouveau moteur
+        // n'a pas reçu la config envoyée à l'instance précédente.
+        if (msg.version) { this._configSent = false; }
         if (this.configProvider && !this._configSent) {
-          Promise.resolve(this.configProvider()).then((cfg) => this.sendConfig(cfg));
+          // Contrat v1.1.0 : chaque ready reçoit config OU config_error —
+          // jamais le silence. Un provider qui échoue est TOUJOURS signalé au jeu.
+          Promise.resolve(this.configProvider())
+            .then((cfg) => this.sendConfig(cfg))
+            .catch((err) => this.sendConfigError("config_provider_failed", true, err));
         }
         if (this._resolveLoaded) { this._resolveLoaded(); this._resolveLoaded = null; }
         break;

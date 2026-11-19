@@ -21,10 +21,23 @@ var _rest_screen: Control = null
 func _ready() -> void:
 	Bridge.send_ready()
 	Bridge.config_received.connect(_on_config)
+	Bridge.config_error_received.connect(_on_config_error)
 	Bridge.stop_requested.connect(_on_stop)
 	# mode dev : aucune configuration en 2 s → config locale selon un jeu de dev ou sandbox
 	Bridge.wait_for_config_or_dev("res://dev/config_sandbox.json")
 	_load_scene(FALLBACK_SCENE)
+
+## Contrat DPP v1.1.0 : la plateforme signale son échec de configuration.
+## Écran d'erreur calme + Réessayer qui réémet ready (nouveau cycle de vie).
+func _on_config_error(code: String, retry: bool) -> void:
+	Bridge.send_error(code, "La configuration n'a pas pu être obtenue (%s)." % code)
+	if _current_game == null:
+		return
+	var err := ErrorScreen.build("config_error: %s" % code)
+	_current_game.add_child(err)
+	err.retry_requested.connect(func() -> void:
+		if retry:
+			Bridge.resend_ready())
 
 func _on_config(payload: Dictionary) -> void:
 	# recharger la scène racine serait coûteux : on change le jeu en place

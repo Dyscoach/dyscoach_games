@@ -1,6 +1,10 @@
 class_name ErrorScreen
 extends Control
 ## Écran d'erreur calme : jamais anxiogène, propose « Réessayer ».
+## Contrat DPP v1.1.0 : retry_requested est émis au clic ; le chargeur (main.gd)
+## décide de l'action (réémettre ready après config_error, nettoyer, etc.).
+
+signal retry_requested()
 
 static func build(message: String) -> ErrorScreen:
 	var screen := ErrorScreen.new()
@@ -38,6 +42,7 @@ static func build(message: String) -> ErrorScreen:
 	vb.add_child(wrap)
 	btn.pressed.connect(func() -> void:
 		Bridge.send_event("error_retry", {"code": "retry_requested"})
+		screen.retry_requested.emit()
 		screen.queue_free()
 	)
 	# le message technique n'est pas montré à l'enfant ; il reste dans l'événement "error"

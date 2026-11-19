@@ -13,14 +13,16 @@ const proto = JSON.parse(readFileSync(new URL("./protocol.json", import.meta.url
 
 console.log("— schéma du protocole —");
 check(proto.protocol_name === "dyscoach-play", "nom du protocole");
-check(proto.protocol_version === "1.0.0", "version 1.0.0");
+check(proto.protocol_version === "1.1.0", "version 1.1.0");
 check(typeof proto.invariants.one_session_end === "string", "invariant un seul session_end documenté");
 
 console.log("— messages host_to_game —");
-for (const t of ["config", "pause", "resume", "audio_ended", "stop"]) {
+for (const t of ["config", "config_error", "pause", "resume", "audio_ended", "stop"]) {
   check(proto.messages_host_to_game[t] !== undefined, `message ${t} défini`);
 }
 check(proto.messages_host_to_game.config.required.includes("items"), "champs obligatoires de config documentés");
+check(typeof proto.messages_host_to_game.config_error.payload.retry === "string", "config_error.retry documenté");
+check(proto.messages_game_to_host.ready !== undefined && proto.lifecycle.order.includes("config | config_error"), "cycle de vie : chaque ready reçoit config ou config_error");
 const ageBands = proto.messages_host_to_game.config.schema_config.age_band;
 check(Array.isArray(ageBands) && ["6-8", "9-11", "12-14", "15-16"].every(b => ageBands.includes(b)), "tranches d'âge documentées");
 
@@ -47,6 +49,10 @@ for (const c of ["audio_missing", "phoneme_audio_missing", "image_missing", "sto
 }
 
 console.log("— implémentation hôte de référence —");
+const hostSrc = readFileSync(new URL("./host/dyscoach-host.js", import.meta.url), "utf8");
+check(hostSrc.includes("sendConfigError"), "hôte : sendConfigError défini");
+check(hostSrc.includes(".catch((err) => this.sendConfigError"), "hôte : échec du configProvider signalé au jeu (pas de silence)");
+check(hostSrc.includes("config_error"), "hôte : message config_error émis");
 const ok = validateConfig({ schema_version: 1, session_id: "s1", game_id: "forge_mots", age_band: "9-11", session_limits: { max_active_minutes: 20 }, items: [{}] });
 check(ok.valid, "validateConfig accepte une config valide");
 const bad = validateConfig({ schema_version: 3, age_band: "99-99" });
@@ -57,6 +63,9 @@ const bridge = readFileSync(new URL("../core/bridge.gd", import.meta.url), "utf8
 for (const t of ["ready", "play_audio", "stop_audio", "event", "session_end", "error"]) {
   check(bridge.includes(`"${t}"`), `bridge.gd implémente ${t}`);
 }
+check(bridge.includes("config_error"), "bridge.gd implémente config_error (reçu de l'hôte)");
+check(bridge.includes("resend_ready"), "bridge.gd réémet ready (Réessayer)");
+check(bridge.includes("_has_host_parent") || bridge.includes("has_host_parent"), "bridge.gd distingue exécution locale / iframe hôte");
 const main = readFileSync(new URL("../main/main.gd", import.meta.url), "utf8");
 for (const g of games) check(main.includes(`"${g}"`), `main.gd enregistre le jeu ${g}`);
 

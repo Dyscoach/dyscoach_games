@@ -30,7 +30,9 @@
   <button id="stop-btn">Stop</button>
 </header>
 <div id="frame-wrap">
-  <iframe id="game-frame" title="Jeu DysCoach" sandbox="allow-scripts"></iframe>
+  <!-- Pas d'attribut sandbox : une iframe sandboxée sans allow-same-origin a une
+     origine opaque ("null") que le pont du jeu rejette (origin_check du DPP). -->
+  <iframe id="game-frame" title="Jeu DysCoach"></iframe>
 </div>
 <div id="events"><b>Événements reçus :</b></div>
 <script>

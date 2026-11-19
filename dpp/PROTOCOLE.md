@@ -32,7 +32,7 @@ Règles d'indépendance :
    `tests/test_core.gd` rejouent des messages du schéma, et la page `tools/host_test.html`
    est une implémentation hôte réelle utilisable par l'équipe plateforme comme bac à sable.
 
-## 3. Schéma des messages (protocol.json, version 1.0)
+## 3. Schéma des messages (protocol.json, version 1.1)
 
 ### 3.1 Enveloppe commune
 
@@ -52,6 +52,7 @@ aucun message (ni prénom, ni texte libre) — le prénom éventuel voyage dans 
 | `pause` / `resume` | — | gel du compteur de temps actif |
 | `audio_ended` | `{ "id": "a12" }` | accusé de lecture ; débloque le timeout du jeu |
 | `stop` | — | fin immédiate propre → le jeu répond `session_end{reason:"stopped"}` |
+| `config_error` | `{ "code": "config_provider_failed\|config_invalid_host_side", "retry": true }` | **v1.1** la plateforme n'a pas pu produire la config ; le jeu affiche l'écran d'erreur calme, `Réessayer` réémet `ready` |
 
 ### 3.3 Jeu → hôte
 
@@ -106,7 +107,8 @@ Le serveur de la plateforme valide ces schémas et **refuse tout champ inattendu
 hôte                              jeu
  │                                 │
  │◄─────── ready {protocol} ───────┤  (jeu démarré, écoute posée)
- │──────── config {payload} ──────►│  (validation ; erreur calme si invalide)
+ │──── config {payload} ──────────►│  (validation ; erreur calme si invalide)
+ │   OU config_error {code,retry} ─│  (v1.1 : échec provider signalé, jamais le silence)
  │◄──── event session_started ─────┤
  │         ... partie ...          │
  │──────── pause / resume ────────►│  (onglet masqué, bouton parent)
@@ -117,9 +119,17 @@ hôte                              jeu
  │                                 │
 ```
 
-Garanties : exactement un `session_end` par session ; `seq` strictement croissant ;
-le jeu continue sans planter si un audio manque (`error audio_missing` envoyé) ; le
-jeu ne stocke rien (sans état) — la plateforme possède toutes les données.
+Garanties : **chaque `ready` reçoit exactement une réponse — `config` OU
+`config_error`, jamais le silence** (v1.1) ; exactement un `session_end` par session ;
+`seq` strictement croissant ; le jeu continue sans planter si un audio manque
+(`error audio_missing` envoyé) ; le jeu ne stocke rien (sans état) — la plateforme
+possède toutes les données.
+
+En iframe hôte, si aucun des deux n'arrive dans les 8 s (`host_config_timeout_ms`),
+le jeu affiche lui-même l'écran d'erreur calme (toujours récupérable : `Réessayer`
+réémet `ready`). Le repli par fichier dev (`dev/config_*.json`) n'existe qu'en
+exécution locale autonome (`window.parent === window`) — jamais en iframe, jamais
+en production.
 
 ## 7. Comment les deux équipes travaillent indépendamment
 
