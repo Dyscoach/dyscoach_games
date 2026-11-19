@@ -38,16 +38,16 @@
 <script>
 "use strict";
 const CONFIGS = {
-  "sandbox (dev)": "/config_sandbox.json",
-  "forge_mots (dev)": "/config_forge_mots.json",
-  "forge_mots (invalide)": "/config_forge_mots_invalide.json",
-  "chasse_sons (dev)": "/config_chasse_sons.json",
-  "duo_mots (dev)": "/config_duo_mots.json",
-  "memo_mots (dev)": "/config_memo_mots.json",
-  "syllabo (dev)": "/config_syllabo.json",
-  "radar_lettres (dev)": "/config_radar_lettres.json",
-  "sonimaux (dev)": "/config_sonimaux.json",
-  "sonimaux (histoire non filtrée)": "/config_sonimaux_unsafe.json",
+  "sandbox (dev)": "config_sandbox.json",
+  "forge_mots (dev)": "config_forge_mots.json",
+  "forge_mots (invalide)": "config_forge_mots_invalide.json",
+  "chasse_sons (dev)": "config_chasse_sons.json",
+  "duo_mots (dev)": "config_duo_mots.json",
+  "memo_mots (dev)": "config_memo_mots.json",
+  "syllabo (dev)": "config_syllabo.json",
+  "radar_lettres (dev)": "config_radar_lettres.json",
+  "sonimaux (dev)": "config_sonimaux.json",
+  "sonimaux (histoire non filtrée)": "config_sonimaux_unsafe.json",
 };
 const frame = document.getElementById("game-frame");
 const select = document.getElementById("config-select");
@@ -158,7 +158,7 @@ document.getElementById("pause-btn").addEventListener("click", () => post({ type
 document.getElementById("resume-btn").addEventListener("click", () => post({ type: "resume" }));
 document.getElementById("stop-btn").addEventListener("click", () => post({ type: "stop" }));
 
-frame.src = "/index.html";
+frame.src = new URL("index.html", document.baseURI).href;
 </script>
 </body>
 </html>
