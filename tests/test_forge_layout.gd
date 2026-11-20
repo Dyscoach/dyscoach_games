@@ -65,6 +65,14 @@ func _ready() -> void:
 		if not screen.encloses(r):
 			tiles_in2 = false
 	check(tiles_in2, "bateau : toutes les tuiles dans le viewport")
+	# brique DA : décor forge + mascotte présents
+	var da_found := false
+	for c in _game.get_children():
+		if c is Backdrop:
+			da_found = true
+			check(c.universe == "forge", "décor forge appliqué")
+	check(da_found, "décor Backdrop présent")
+	check(_game._buddy != null and _game._buddy is Buddy, "mascotte Buddy instanciée")
 	_finish()
 
 func _load_dev_config() -> Dictionary:

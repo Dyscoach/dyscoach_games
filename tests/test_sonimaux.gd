@@ -133,6 +133,15 @@ func _test_zone_launch() -> void:
 		await get_tree().process_frame
 		check(game._zones_done.has("zone_radar"), "zone_radar marquée terminée")
 		check(game._active_zone_game == null, "mini-jeu de zone libéré")
+
+	# brique DA : décor d'univers + mascotte présents
+	var _da_found := false
+	for c in game.get_children():
+		if c is Backdrop:
+			_da_found = true
+			check(c.universe == "espace", "décor espace appliqué")
+	check(_da_found, "décor Backdrop présent")
+	check(game._buddy != null and game._buddy is Buddy, "mascotte Buddy instanciée")
 	game.queue_free()
 
 func _finish() -> void:

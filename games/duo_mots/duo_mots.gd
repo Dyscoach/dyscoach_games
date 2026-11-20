@@ -16,6 +16,7 @@ var _cards_row: HBoxContainer = null
 var _status: Label = null
 var _speaker: Button = null
 var _dots: ProgressDots = null
+var _buddy: Buddy = null
 var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
@@ -31,10 +32,9 @@ func _setup(cfg: GameConfig) -> void:
 	start()
 
 func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = ThemeService.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	var backdrop := Backdrop.new()
+	backdrop.setup("scene", _is_sober())
+	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -57,6 +57,10 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
+	_buddy = Buddy.new()
+	_buddy.set_sober(_is_sober())
+	_buddy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_buddy)
 	top.add_child(build_time_gauge())
 
 	# consigne écrite affichée en permanence sous le titre (une seule idée, courte)
@@ -96,6 +100,8 @@ func _next_pair() -> void:
 		_finished = true
 		_set_status(Strings.SUCCESS_BRAVO, "★")
 		Sfx.celebration()
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_CHEER, 4.0)
 		var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
 		timer.timeout.connect(func() -> void:
 			_set_status(Strings.SUMMARY_DONE % _items_done, "")
@@ -157,6 +163,9 @@ func _build_cards() -> void:
 func _is_written_variant() -> bool:
 	return config.difficulty_level >= 4
 
+func _is_sober() -> bool:
+	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
+
 # --- audio ---
 
 func _play_target() -> void:
@@ -217,6 +226,8 @@ func _on_card_pressed(card_index: int, is_target: bool) -> void:
 		compare_both_words_safe()
 		complete_item(str(_current.get("item_id", "")), _first_try, _attempts, 0)
 		_set_status(Strings.DUO_SUCCESS % chosen_word, "★")
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_HAPPY_WORD % chosen_word)
 		_dots.light_next()
 		var timer := get_tree().create_timer(1.8)
 		timer.timeout.connect(func() -> void:
@@ -229,6 +240,8 @@ func _on_card_pressed(card_index: int, is_target: bool) -> void:
 		ThemeService.gentle_shake(card)
 		report_answer(str(_current.get("item_id", "")), false, detail, _attempts, Time.get_ticks_msec() - _item_start_ms)
 		_set_status(Strings.DUO_RETRY, "")
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.ENCOURAGE, Strings.BUDDY_ENCOURAGE)
 		compare_both_words_safe()
 		_requeue_with_other_target()
 

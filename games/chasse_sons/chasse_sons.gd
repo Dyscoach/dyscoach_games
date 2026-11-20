@@ -20,6 +20,7 @@ var _speaker: Button = null
 var _instruction: Label = null
 var _item_start_ms: int = 0
 var _dots: ProgressDots = null
+var _buddy: Buddy = null
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_chasse_config(cfg.raw)
@@ -33,10 +34,9 @@ func _setup(cfg: GameConfig) -> void:
 	start()
 
 func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = ThemeService.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	var backdrop := Backdrop.new()
+	backdrop.setup("etang", _is_sober())
+	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -59,6 +59,10 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
+	_buddy = Buddy.new()
+	_buddy.set_sober(_is_sober())
+	_buddy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_buddy)
 	top.add_child(build_time_gauge())
 
 	_instruction = Label.new()
@@ -174,6 +178,8 @@ func _on_item_tapped(item: FloatingItem) -> void:
 		# bonne réponse : l'élément éclot, réussite notée
 		item.hatch()
 		Sfx.pair_bell()
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_HAPPY_WORD % str(data.get("word", "")))
 		_found_in_round += 1
 		_dots.light_next()
 		report_answer(item_id, true, {"phoneme_id": str(_target.get("phoneme_id", "")), "has_target": true, "tapped_target": true, "position": position}, 1, Time.get_ticks_msec() - _item_start_ms)
@@ -183,6 +189,8 @@ func _on_item_tapped(item: FloatingItem) -> void:
 	else:
 		# erreur : tremblement doux, retour court, l'élément reviendra plus tard (réinsertion)
 		item.gentle_shake()
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.ENCOURAGE, Strings.BUDDY_ENCOURAGE)
 		report_answer(item_id, false, {"phoneme_id": str(_target.get("phoneme_id", "")), "has_target": false, "tapped_target": false, "position": position}, 1, Time.get_ticks_msec() - _item_start_ms)
 		var first_sound := str(data.get("word", "")).substr(0, 1)
 		_set_status(_ecar_message(data, first_sound))
@@ -203,6 +211,9 @@ func _ecar_message(data: Dictionary, _first_sound: String) -> String:
 		_:
 			return Strings.CHASSE_RETRY_END % [word, label]
 
+func _is_sober() -> bool:
+	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
+
 func _check_round_end() -> void:
 	if _found_in_round >= _targets_in_round:
 		_set_status(Strings.CHASSE_ROUND_DONE)
@@ -212,6 +223,8 @@ func _check_round_end() -> void:
 
 func _finish_rounds() -> void:
 	_set_status(Strings.SUMMARY_DONE % _items_done)
+	if _buddy != null:
+		_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_CHEER, 4.0)
 	finish_session("completed")
 
 # --- audio ---

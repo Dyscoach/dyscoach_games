@@ -20,6 +20,7 @@ var _model_label: Label = null
 var _grid: GridContainer = null
 var _speaker: Button = null
 var _dots: ProgressDots = null
+var _buddy: Buddy = null
 var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
@@ -33,10 +34,9 @@ func _setup(cfg: GameConfig) -> void:
 	start()
 
 func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = ThemeService.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	var backdrop := Backdrop.new()
+	backdrop.setup("nuit", _is_sober())
+	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -59,6 +59,10 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
+	_buddy = Buddy.new()
+	_buddy.set_sober(_is_sober())
+	_buddy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_buddy)
 	top.add_child(build_time_gauge())
 
 	# modèle + mot-repère (ex. « b comme bateau »)
@@ -173,6 +177,8 @@ func _on_cell_pressed(btn: Button) -> void:
 		# cible touchée : s'illumine et reste visible
 		_found_count += 1
 		Sfx.pair_bell()
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_FOUND)
 		btn.disabled = true
 		btn.focus_mode = Control.FOCUS_NONE
 		var sb := StyleBoxFlat.new()
@@ -194,6 +200,8 @@ func _on_cell_pressed(btn: Button) -> void:
 	else:
 		# mauvaise lettre : tremble doucement, la voix nomme la lettre ; elle reste en place
 		ThemeService.gentle_shake(btn)
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.ENCOURAGE, Strings.BUDDY_ENCOURAGE)
 		_confusions.append({"tapped": tapped, "expected": target})
 		report_answer(item_id, false, {"target": target, "tapped": tapped, "was_target": false}, _attempts, Time.get_ticks_msec() - _item_start_ms)
 		_set_status(Strings.RADAR_WRONG % tapped)
@@ -205,6 +213,8 @@ func _finish_session_quietly() -> void:
 	# toutes les grilles travaillées : bref moment de célébration, jamais de score
 	_set_status(Strings.SUCCESS_BRAVO)
 	Sfx.celebration()
+	if _buddy != null:
+		_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_CHEER, 4.0)
 	var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
 	timer.timeout.connect(func() -> void:
 		_set_status(Strings.SUMMARY_DONE % _items_done)
@@ -218,6 +228,9 @@ func _process(_delta: float) -> void:
 func _set_status(text: String) -> void:
 	if _status != null:
 		_status.text = text
+
+func _is_sober() -> bool:
+	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
 
 func on_pause() -> void:
 	SessionTimer.pause()

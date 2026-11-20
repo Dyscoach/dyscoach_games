@@ -118,6 +118,15 @@ func _test_round_logic() -> void:
 		check(not bool(answers2[0]["correct"]), "distracteur touché → incorrect")
 	check(game._pool.size() >= pool_before_error, "distracteur réinséré dans la piscine (reviendra plus tard)")
 	check(game._found_in_round == 1, "l'erreur ne bloque pas la manche")
+
+	# brique DA : décor d'univers + mascotte présents
+	var _da_found := false
+	for c in game.get_children():
+		if c is Backdrop:
+			_da_found = true
+			check(c.universe == "etang", "décor etang appliqué")
+	check(_da_found, "décor Backdrop présent")
+	check(game._buddy != null and game._buddy is Buddy, "mascotte Buddy instanciée")
 	game.queue_free()
 
 func _finish() -> void:

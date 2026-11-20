@@ -22,6 +22,7 @@ var _buttons_box: VBoxContainer = null
 var _carnet_btn: Button = null
 var _pending_animations_done: bool = false
 var _dots: ProgressDots = null
+var _buddy: Buddy = null
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_sonimaux_config(cfg.raw)
@@ -55,10 +56,9 @@ func _lines_too_long(max_words: int) -> bool:
 	return false
 
 func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = ThemeService.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	var backdrop := Backdrop.new()
+	backdrop.setup("espace", _is_sober())
+	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -79,6 +79,10 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
+	_buddy = Buddy.new()
+	_buddy.set_sober(_is_sober())
+	_buddy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_buddy)
 	top.add_child(build_time_gauge())
 
 	_story_label = Label.new()
@@ -203,6 +207,8 @@ func _zone_finished(zone: Dictionary) -> void:
 		_zones_done.append(zone_id)
 	_dots.light_next()
 	Sfx.pair_bell()
+	if _buddy != null:
+		_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_CHEER)
 	Telemetry.emit_event("zone_completed", {"zone_id": zone_id, "items_done": _items_done})
 	zone_completed.emit(zone_id)
 	if _active_zone_game != null:
@@ -287,6 +293,9 @@ func _creature_name(creature_id: String) -> String:
 func _set_status(text: String) -> void:
 	if _status != null:
 		_status.text = text
+
+func _is_sober() -> bool:
+	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
 
 func on_pause() -> void:
 	SessionTimer.pause()

@@ -19,6 +19,7 @@ var _train_box: HBoxContainer = null
 var _finish_btn: Button = null
 var _speaker: Button = null
 var _dots: ProgressDots = null
+var _buddy: Buddy = null
 var _initial_count: int = 0
 var _finished: bool = false
 
@@ -33,10 +34,9 @@ func _setup(cfg: GameConfig) -> void:
 	start()
 
 func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = ThemeService.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	var backdrop := Backdrop.new()
+	backdrop.setup("campagne", _is_sober())
+	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -59,6 +59,10 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
+	_buddy = Buddy.new()
+	_buddy.set_sober(_is_sober())
+	_buddy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_buddy)
 	top.add_child(build_time_gauge())
 
 	# consigne écrite affichée en permanence sous le titre (une seule idée, courte)
@@ -126,6 +130,8 @@ func _next_word() -> void:
 			_finished = true
 			_set_status(Strings.SUCCESS_BRAVO)
 			Sfx.celebration()
+			if _buddy != null:
+				_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_CHEER, 4.0)
 			var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
 			timer.timeout.connect(func() -> void:
 				_set_status(Strings.SUMMARY_DONE % _items_done)
@@ -217,6 +223,8 @@ func _validate(auto: bool) -> void:
 		report_answer(str(_current.get("item_id", "")), false, detail, _attempt_no, Time.get_ticks_msec() - _item_start_ms)
 		# autre nombre : redécoupage lent, puis l'enfant réessaie une fois
 		_set_status(Strings.SYL_RETRY)
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.ENCOURAGE, Strings.BUDDY_ENCOURAGE)
 		_slow_decompose()
 		if _attempt_no >= 2:
 			# après un 2e essai raté : le mot revient plus tard (réinsertion), on passe au suivant
@@ -241,6 +249,8 @@ func _slow_decompose() -> void:
 func _complete_word() -> void:
 	var word := str(_current.get("word", ""))
 	_set_status(Strings.SYL_SUCCESS % [int(_current.get("syllable_count", 0)), word])
+	if _buddy != null:
+		_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_HAPPY_WORD % word)
 	# la voix redit le mot en le découpant (syllabes fournies), un wagon éclairé par syllabe
 	var syllables: Array = _current.get("syllables", [])
 	_glow_wagons(0, syllables)
@@ -275,6 +285,9 @@ func _process(_delta: float) -> void:
 func _set_status(text: String) -> void:
 	if _status != null:
 		_status.text = text
+
+func _is_sober() -> bool:
+	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
 
 func on_pause() -> void:
 	SessionTimer.pause()

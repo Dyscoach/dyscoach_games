@@ -108,6 +108,15 @@ func _test_events_conformity() -> void:
 		var d: Dictionary = answers[0]["detail"]
 		check(str(d.get("pair_id")) == "pair_chat_rat" and str(d.get("chosen_word")) == "chat" and str(d.get("expected_word")) == "chat", "detail conforme {pair_id, chosen_word, expected_word, contrast_label}")
 		check(d.has("contrast_label"), "contrast_label présent")
+
+	# brique DA : décor d'univers + mascotte présents
+	var _da_found := false
+	for c in game.get_children():
+		if c is Backdrop:
+			_da_found = true
+			check(c.universe == "scene", "décor scene appliqué")
+	check(_da_found, "décor Backdrop présent")
+	check(game._buddy != null and game._buddy is Buddy, "mascotte Buddy instanciée")
 	game.queue_free()
 
 func _finish() -> void:

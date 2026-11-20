@@ -63,6 +63,10 @@ const MEMO_CELEBRATION := "Toutes les paires sont retrouvées !"
 const BUDDY_MEMO_FOUND := "Bien vu ! %s !"
 const BUDDY_RETRY := "Presque ! On regarde encore."
 const BUDDY_CELEBRATION := "Bravo, quelle mémoire !"
+const BUDDY_FOUND := "Bien joué !"
+const BUDDY_ENCOURAGE := "Presque ! On réessaie."
+const BUDDY_CHEER := "Bravo !"
+const BUDDY_HAPPY_WORD := "Super ! %s !"
 
 # --- Syllabo ---
 const SYL_TITLE := "Syllabo"

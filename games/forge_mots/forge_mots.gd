@@ -32,6 +32,7 @@ var _status: Label = null
 var _speaker: Button = null
 var _validate_btn: Button = null
 var _dots: ProgressDots = null
+var _buddy: Buddy = null
 var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
@@ -46,10 +47,9 @@ func _setup(cfg: GameConfig) -> void:
 	_build_ui()
 
 func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = ThemeService.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
+	var backdrop := Backdrop.new()
+	backdrop.setup("forge", _is_sober())
+	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 48)
@@ -72,6 +72,10 @@ func _build_ui() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	top.add_child(title)
+	_buddy = Buddy.new()
+	_buddy.set_sober(_is_sober())
+	_buddy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_buddy)
 	top.add_child(build_time_gauge())
 
 	# consigne écrite affichée en permanence sous le titre (une seule idée, courte)
@@ -338,6 +342,8 @@ func _check_slot(index: int) -> void:
 		_first_try = false
 		var errs: int = int(_slot_errors.get(index, 0)) + 1
 		_slot_errors[index] = errs
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.ENCOURAGE, Strings.BUDDY_ENCOURAGE)
 		# la tuile revient doucement à la réserve, sans son négatif
 		ThemeService.gentle_shake(_slot_tiles[index])
 		var tile := _find_reserve_like(placed)
@@ -373,6 +379,9 @@ func _confusion_pair(a: String, b: String) -> String:
 		if (a == pair[0] and b == pair[1]) or (a == pair[1] and b == pair[0]):
 			return "%s/%s" % [pair[0], pair[1]]
 	return ""
+
+func _is_sober() -> bool:
+	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
 
 # --- aides ---
 
@@ -468,6 +477,8 @@ func _first_error_index() -> int:
 func _word_complete() -> void:
 	var word := str(_current.get("word", _current.get("item_id", "")))
 	_set_status(Strings.FORGE_SUCCESS_WORD % word)
+	if _buddy != null:
+		_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_HAPPY_WORD % word)
 	# la voix redit le mot en syllabes
 	var audio: Dictionary = _current.get("audio", {})
 	if str(audio.get("word", "")) != "":
@@ -581,6 +592,8 @@ func _show_summary() -> void:
 		_finished = true
 		_set_status(Strings.SUCCESS_BRAVO)
 		Sfx.celebration()
+		if _buddy != null:
+			_buddy.react(Buddy.Mood.HAPPY, Strings.BUDDY_CHEER, 4.0)
 		var timer := get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0)
 		timer.timeout.connect(func() -> void:
 			_set_status(Strings.SUMMARY_DONE % _finished_words)

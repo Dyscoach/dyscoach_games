@@ -106,6 +106,15 @@ func _test_wrong_then_retry_then_requeue() -> void:
 			bus_requeued = true
 	check(bus_requeued, "bus réinséré pour plus tard après 2 essais")
 	check(str(game._current.get("word")) == "vélo", "passage au mot suivant (vélo)")
+
+	# brique DA : décor d'univers + mascotte présents
+	var _da_found := false
+	for c in game.get_children():
+		if c is Backdrop:
+			_da_found = true
+			check(c.universe == "campagne", "décor campagne appliqué")
+	check(_da_found, "décor Backdrop présent")
+	check(game._buddy != null and game._buddy is Buddy, "mascotte Buddy instanciée")
 	game.queue_free()
 
 func _finish() -> void:

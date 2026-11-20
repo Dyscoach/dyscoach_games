@@ -1,5 +1,6 @@
 ## Pastille de progression calme : un rond qui s'allume (vert) quand une étape est réussie.
 ## Jamais de chiffres ni de comparaison — la ligne se remplit au fil des réussites.
+## Pastille vide : anneau INK_SOFT contrasté (>= 3:1, indicateur d'état clé) ; allumée : vert + éclat.
 class_name ProgressDots
 extends Control
 
@@ -34,5 +35,6 @@ func _draw() -> void:
 			# petite étoile discrète à l'intérieur (pas seulement la couleur)
 			draw_circle(c, _dot_r * 0.22, ThemeService.GOOD)
 		else:
-			draw_circle(c, _dot_r, ThemeService.BORDER)
-			draw_circle(c, _dot_r * 0.62, ThemeService.SURFACE)
+			# vide : anneau contrasté + centre clair (lisible sur tout fond de jeu)
+			draw_circle(c, _dot_r, ThemeService.INK_SOFT)
+			draw_circle(c, _dot_r - 3.0, ThemeService.SURFACE)

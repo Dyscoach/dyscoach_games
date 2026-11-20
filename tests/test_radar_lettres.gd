@@ -102,6 +102,15 @@ func _test_session_ceiling() -> void:
 	await get_tree().process_frame
 	await get_tree().create_timer(Tuning.FX_CELEBRATION_MS / 1000.0 + 0.3).timeout
 	check(game._finish_requested, "échéance atteinte → fin propre de la séance")
+
+	# brique DA : décor d'univers + mascotte présents
+	var _da_found := false
+	for c in game.get_children():
+		if c is Backdrop:
+			_da_found = true
+			check(c.universe == "nuit", "décor nuit appliqué")
+	check(_da_found, "décor Backdrop présent")
+	check(game._buddy != null and game._buddy is Buddy, "mascotte Buddy instanciée")
 	game.queue_free()
 
 func _finish() -> void:

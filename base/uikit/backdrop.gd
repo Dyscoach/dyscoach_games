@@ -51,14 +51,22 @@ func _draw() -> void:
 	var halo_c: Color = u["halo"]
 	draw_circle(orb_c, 84.0, Color(halo_c, 0.22))
 	draw_circle(orb_c, 46.0, u["orb"])
-	# étoiles discrètes (nuit / espace) : points fixes, jamais clignotants
+	# étoiles discrètes (nuit / espace) : points fixes, jamais clignotants,
+	# visibles (4 branches, alpha 0,5) sans capter l'attention
 	if bool(u.get("stars", false)):
-		var ink := Color(0.35, 0.38, 0.55, 0.30)
+		var ink := Color(0.30, 0.33, 0.50, 0.50)
 		var abscissas := [0.08, 0.22, 0.35, 0.48, 0.62, 0.75, 0.9]
 		var i := 0
 		for fx in abscissas:
-			var fy := 0.06 + 0.05 * float((i * 3) % 4)
-			draw_circle(Vector2(w * fx, h * fy), 4.0 + float(i % 3), ink)
+			var star_c := Vector2(w * fx, h * (0.06 + 0.05 * float((i * 3) % 4)))
+			var r := 7.0 + float(i % 3) * 2.0
+			var pts := PackedVector2Array([
+				star_c + Vector2(0, -r), star_c + Vector2(r * 0.3, -r * 0.3),
+				star_c + Vector2(r, 0), star_c + Vector2(r * 0.3, r * 0.3),
+				star_c + Vector2(0, r), star_c + Vector2(-r * 0.3, r * 0.3),
+				star_c + Vector2(-r, 0), star_c + Vector2(-r * 0.3, -r * 0.3),
+			])
+			draw_colored_polygon(pts, ink)
 			i += 1
 	# collines : deux arcs bas, pastel, du plus clair (loin) au plus soutenu (proche)
 	var layers: Array = u["layers"]
