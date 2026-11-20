@@ -39,10 +39,11 @@ func _build_ui() -> void:
 	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var v_margin := 24 if size.y >= 1200.0 else 10
 	margin.add_theme_constant_override("margin_left", 48)
 	margin.add_theme_constant_override("margin_right", 48)
-	margin.add_theme_constant_override("margin_top", 24)
-	margin.add_theme_constant_override("margin_bottom", 32)
+	margin.add_theme_constant_override("margin_top", v_margin)
+	margin.add_theme_constant_override("margin_bottom", v_margin)
 	add_child(margin)
 	_main_vb = VBoxContainer.new()
 	_main_vb.add_theme_constant_override("separation", 20)
@@ -103,7 +104,7 @@ func _build_ui() -> void:
 	_main_vb.add_child(drum_center)
 	_drum = Button.new()
 	_drum.text = ""
-	var d := maxf(ThemeService.min_touch_target() * 1.6, 240.0)
+	var d: float = clampf(size.y * 0.16, ThemeService.min_touch_target(), 300.0)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = ThemeService.ACCENT
 	sb.set_corner_radius_all(int(d / 2.0))

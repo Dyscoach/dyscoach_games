@@ -21,6 +21,7 @@ var _instruction: Label = null
 var _item_start_ms: int = 0
 var _dots: ProgressDots = null
 var _buddy: Buddy = null
+var _round_widgets: Array = []        # FloatingItem de la manche (repositionnables)
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_chasse_config(cfg.raw)
@@ -84,6 +85,9 @@ func _build_ui() -> void:
 	_items_layer = Control.new()
 	_items_layer.clip_contents = true
 	_items_layer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# la couche reçoit sa taille réelle APRÈS le tri des containers : repositionner
+	# la manche à chaque resize (différé : laisser les containers trier d'abord)
+	_items_layer.resized.connect(_relayout_round.bind(), CONNECT_DEFERRED)
 	_main_vb.add_child(_items_layer)
 
 	_status = Label.new()
@@ -136,6 +140,7 @@ func _new_round() -> void:
 
 func _layout_items() -> void:
 	# positions en grille stable + légère dérive sinusoïdale (jamais de chute)
+	_round_widgets.clear()
 	var n := _round_items.size()
 	var cols: int = 2 if n <= 4 else 3
 	var rows := int(ceil(float(n) / float(cols)))
@@ -157,6 +162,44 @@ func _layout_items() -> void:
 		_items_layer.add_child(item)
 		item.begin_drift(center, Tuning.CHASSE_DRIFT_AMPLITUDE, Tuning.CHASSE_DRIFT_PERIOD_S, i)
 		ThemeService.gentle_appear(item, i * Tuning.FX_APPEAR_STAGGER_S)
+		_round_widgets.append(item)
+		i += 1
+
+# Colonnes adaptées au ratio de la zone : grille la plus carrée possible,
+# bornée (2..4) — en paysage la grille s'étale, en portrait elle reste 2-3 colonnes.
+func _columns_for(n: int, area: Vector2) -> int:
+	if area.y <= 10:
+		return 2 if n <= 4 else 3
+	var ideal := sqrt(float(n) * area.x / maxf(area.y, 1.0))
+	return clampi(int(round(ideal)), 2, mini(4, maxi(2, n)))
+
+# La zone de jeu se redimensionne (rotation/petit écran) : repositionner la manche
+# pour que les cibles restent ENTIÈREMENT visibles (tolérance aux imprécisions DYS :
+# jamais de cible à moitié coupée).
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and _round_widgets.size() > 0:
+		_relayout_round.call_deferred()
+
+func _relayout_round() -> void:
+	var n := _round_widgets.size()
+	var area := _items_layer.get_rect().size
+	if area.x < 10:
+		return
+	var cols := _columns_for(n, area)
+	var rows := int(ceil(float(n) / float(cols)))
+	var cell_w := area.x / cols
+	var cell_h := area.y / maxi(rows, 1)
+	var item_size := minf(minf(cell_w, cell_h) * 0.86, ThemeService.min_touch_target() * 1.9)
+	item_size = maxf(item_size, ThemeService.min_touch_target())
+	var i := 0
+	for widget in _round_widgets:
+		var item: FloatingItem = widget
+		var col := i % cols
+		var row := i / cols
+		var center := Vector2((col + 0.5) * cell_w, (row + 0.5) * cell_h)
+		item.custom_minimum_size = Vector2(item_size, item_size)
+		item.size = Vector2(item_size, item_size)
+		item.begin_drift(center, Tuning.CHASSE_DRIFT_AMPLITUDE, Tuning.CHASSE_DRIFT_PERIOD_S, i)
 		i += 1
 
 # --- interactions ---

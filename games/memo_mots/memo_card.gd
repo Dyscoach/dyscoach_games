@@ -15,17 +15,20 @@ var is_matched: bool = false
 var _face_up: bool = false
 var _flip_tween: Tween = null
 
-static func new_card(item: Dictionary, card_side: String) -> MemoCard:
+static func new_card(item: Dictionary, card_side: String, card_size: float = 216.0) -> MemoCard:
 	var card := MemoCard.new()
 	card.data = item
 	card.side = card_side
-	card.custom_minimum_size = Vector2(216, 216)
+	card.custom_minimum_size = Vector2(card_size, card_size)
 	card.flip_down()
-	card.pivot_offset = Vector2(108, 108)
+	card.pivot_offset = Vector2(cardSizeHalf(card_size), cardSizeHalf(card_size))
 	card.pressed.connect(func() -> void:
 		if not card._face_up and not card.is_matched:
 			card.card_flipped.emit(card))
 	return card
+
+static func cardSizeHalf(s: float) -> float:
+	return s * 0.5
 
 func pair_id() -> String:
 	return str(data.get("pair_id", ""))

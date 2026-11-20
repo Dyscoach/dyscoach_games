@@ -132,8 +132,10 @@ func _build_cards() -> void:
 		for i in cards.size():
 			indices.append(i)
 	var n := cards.size()
-	# taille identique pour toutes : calculée sur le nombre de cartes
-	var usable := 984.0
+	# taille identique pour toutes : calculée sur la largeur RÉELLE du jeu
+	var usable: float = size.x - 96.0
+	if usable < 400.0:
+		usable = 400.0
 	var spacing := ThemeService.min_spacing() * 2.0 * (n - 1)
 	var card_w := (usable - spacing) / n
 	card_w = minf(card_w, 440.0)

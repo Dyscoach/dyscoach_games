@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testswipe01"]
+
+[ext_resource type="Script" path="res://tests/test_layout_sweep.gd" id="1"]
+
+[node name="TestLayoutSweep" type="Node"]
+script = ExtResource("1")

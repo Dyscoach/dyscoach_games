@@ -21,6 +21,7 @@ var _grid: GridContainer = null
 var _speaker: Button = null
 var _dots: ProgressDots = null
 var _buddy: Buddy = null
+var _radar_art: BuddyArt = null
 var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
@@ -75,9 +76,12 @@ func _build_ui() -> void:
 	var radar_row := HBoxContainer.new()
 	radar_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	radar_row.add_theme_constant_override("separation", 24)
-	var radar_art := BuddyArt.make("radar", _is_sober(), 170.0)
-	radar_row.add_child(radar_art)
+	_radar_art = BuddyArt.make("radar", _is_sober(), 170.0)
+	radar_row.add_child(_radar_art)
 	_main_vb.add_child(radar_row)
+	# écran étroit : la mascotte et le grand écran radar cèdent la place aux lettres
+	resized.connect(_fit_header.bind(), CONNECT_DEFERRED)
+	_fit_header()
 
 	# progression calme : une pastille par grille de la configuration
 	var dots_wrap := CenterContainer.new()
@@ -98,6 +102,19 @@ func _build_ui() -> void:
 	_grid.add_theme_constant_override("h_separation", ThemeService.min_spacing())
 	_grid.add_theme_constant_override("v_separation", ThemeService.min_spacing())
 	center.add_child(_grid)
+
+func _fit_header() -> void:
+	# étroit OU paysage : compacter le bandeau — la grille de lettres est prioritaire
+	var compact := size.x < 900.0 or size.y < size.x
+	if _buddy != null:
+		_buddy.visible = not compact
+	if _radar_art != null:
+		# l'écran radar décoratif se cache en compact : les lettres gardent la place
+		_radar_art.visible = not compact
+	if _speaker != null:
+		var d: float = 110.0 if compact else maxf(ThemeService.min_touch_target(), 96.0)
+		_speaker.custom_minimum_size = Vector2(d, d)
+		_speaker.add_theme_font_size_override("font_size", int(d * 0.42))
 
 func on_start() -> void:
 	_next_grid()
@@ -137,7 +154,7 @@ func _build_grid() -> void:
 		btn.text = str(letter)
 		btn.custom_minimum_size = Vector2(cell, cell)
 		btn.add_theme_font_override("font", ThemeService.font_bold())
-		btn.add_theme_font_size_override("font_size", Tuning.FONT_SIZE_GRID)
+		btn.add_theme_font_size_override("font_size", int(minf(Tuning.FONT_SIZE_GRID, cell * 0.62)))
 		btn.add_theme_color_override("font_color", ThemeService.INK)
 		btn.add_theme_color_override("font_hover_color", ThemeService.INK)
 		btn.add_theme_color_override("font_pressed_color", ThemeService.INK)
@@ -159,10 +176,14 @@ func _build_grid() -> void:
 
 func _cell_size(n: int, cols: int) -> float:
 	var rows := int(ceil(float(n) / float(cols)))
-	var usable_w := 984.0
-	var usable_h := 900.0
-	var size := minf((usable_w - ThemeService.min_spacing() * (cols - 1)) / cols, (usable_h - ThemeService.min_spacing() * (rows - 1)) / rows)
-	return clampf(size, ThemeService.min_touch_target(), 260.0)
+	var usable_w: float = size.x - 96.0
+	var usable_h: float = size.y * 0.42
+	if usable_w < 400.0:
+		usable_w = 400.0
+	if usable_h < 400.0:
+		usable_h = 400.0
+	var size_px: float = minf((usable_w - ThemeService.min_spacing() * (cols - 1)) / cols, (usable_h - ThemeService.min_spacing() * (rows - 1)) / rows)
+	return clampf(size_px, ThemeService.min_touch_target(), 260.0)
 
 func _play_sound() -> void:
 	var audio: Dictionary = _current.get("audio", {})

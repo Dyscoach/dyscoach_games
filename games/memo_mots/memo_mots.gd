@@ -27,6 +27,7 @@ var _status_icon: Label = null
 var _status_box: HBoxContainer = null
 var _dots: ProgressDots = null
 var _buddy: Buddy = null
+var _title_label: Label = null
 var _finished: bool = false
 
 func _setup(cfg: GameConfig) -> void:
@@ -46,10 +47,11 @@ func _build_ui() -> void:
 	add_child(backdrop)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var v_margin := 24 if size.y >= 1200.0 else 12
 	margin.add_theme_constant_override("margin_left", 40)
 	margin.add_theme_constant_override("margin_right", 40)
-	margin.add_theme_constant_override("margin_top", 24)
-	margin.add_theme_constant_override("margin_bottom", 24)
+	margin.add_theme_constant_override("margin_top", v_margin)
+	margin.add_theme_constant_override("margin_bottom", v_margin)
 	add_child(margin)
 	_main_vb = VBoxContainer.new()
 	_main_vb.add_theme_constant_override("separation", 16)
@@ -66,6 +68,7 @@ func _build_ui() -> void:
 	var title := Label.new()
 	title.text = Strings.MEMO_TITLE
 	ThemeService.style_label(title, Tuning.FONT_SIZE_TITLE, ThemeService.INK, true)
+	_title_label = title
 	title_box.add_child(title)
 	var subtitle := Label.new()
 	subtitle.text = Strings.MEMO_SUB
@@ -109,6 +112,52 @@ func _build_ui() -> void:
 	_grid.columns = _columns_for_pairs()
 	center.add_child(_grid)
 	_deal_cards()
+	# l'espace change (rotation/petit écran) : redimensionner les cartes pour que
+	# la grille tienne ENTIÈREMENT — la taille des cartes suit la place disponible
+	center.resized.connect(_fit_cards.bind(center), CONNECT_DEFERRED)
+	# écran étroit (< 900 px de large) : la mascotte cède la place au contenu
+	# (purement décorative — jamais une perte d'information)
+	resized.connect(_fit_header.bind(), CONNECT_DEFERRED)
+	_fit_header()
+
+func _fit_header() -> void:
+	if _buddy != null:
+		_buddy.visible = size.x >= 900.0
+	# écran étroit : titre légèrement plus petit (jamais sous 40 px, lisible DYS)
+	if _title_label != null:
+		var fs: int = Tuning.FONT_SIZE_TITLE if size.x >= 900.0 else maxi(int(Tuning.FONT_SIZE_TITLE * 0.7), 40)
+		_title_label.add_theme_font_size_override("font_size", int(fs * ThemeService.text_scale))
+
+func _fit_cards(center: CenterContainer) -> void:
+	if _finished or not is_inside_tree() or _cards.is_empty():
+		return
+	var avail := center.size
+	if avail.x < 10 or avail.y < 10:
+		return
+	var cols := float(_grid.columns)
+	var rows: float = ceil(float(_cards.size()) / cols)
+	var spacing := ThemeService.min_spacing()
+	var card_sz: float = minf(
+		(avail.x - spacing * (cols - 1)) / cols,
+		(avail.y - spacing * (rows - 1)) / rows
+	)
+	card_sz = clampf(card_sz, 96.0, 260.0)
+	for c in _cards:
+		if c is MemoCard and not c.is_matched:
+			c.custom_minimum_size = Vector2(card_sz, card_sz)
+			c.pivot_offset = Vector2(card_sz, card_sz) * 0.5
+
+## Taille de carte initiale : calculée sur la largeur réelle du jeu pour que la
+## grille n'impose JAMAIS un minimum supérieur à l'écran (les cartes s'ajustent
+## ensuite à chaque resize via _fit_cards).
+func _initial_card_size() -> float:
+	var usable_w: float = size.x - 80.0   # marges du MarginContainer
+	if usable_w < 10:
+		usable_w = 1000.0
+	var cols := float(_columns_for_pairs())
+	var spacing := ThemeService.min_spacing()
+	var card_sz: float = (usable_w - spacing * (cols - 1)) / cols
+	return clampf(card_sz, 96.0, 216.0)
 
 func _columns_for_pairs() -> int:
 	var n := _items.size()
@@ -127,8 +176,9 @@ func _deal_cards() -> void:
 	var display: Array = entries.duplicate()
 	display.shuffle()
 	var i := 0
+	var card_sz0: float = _initial_card_size()
 	for e in display:
-		var card := MemoCard.new_card(e["item"], str(e["side"]))
+		var card := MemoCard.new_card(e["item"], str(e["side"]), card_sz0)
 		card.card_flipped.connect(_on_card_flipped)
 		_grid.add_child(card)
 		_cards.append(card)
