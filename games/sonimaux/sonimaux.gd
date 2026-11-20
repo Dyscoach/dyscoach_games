@@ -23,6 +23,7 @@ var _carnet_btn: Button = null
 var _pending_animations_done: bool = false
 var _dots: ProgressDots = null
 var _buddy: Buddy = null
+var _companion_art: BuddyArt = null
 
 func _setup(cfg: GameConfig) -> void:
 	var errs := GameConfig.validate_sonimaux_config(cfg.raw)
@@ -91,6 +92,19 @@ func _build_ui() -> void:
 	_story_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	ThemeService.style_label(_story_label, Tuning.FONT_SIZE_BODY, ThemeService.INK, true)
 	_main_vb.add_child(_story_label)
+
+	# le compagnon (Bibi) DESSINÉ : l'aventure a enfin un visage (décoratif, statique)
+	var companion_row := HBoxContainer.new()
+	companion_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	companion_row.add_theme_constant_override("separation", 24)
+	_companion_art = BuddyArt.make("creature", _is_sober(), 190.0)
+	companion_row.add_child(_companion_art)
+	var companion_name := Label.new()
+	companion_name.text = str(_companion.get("name", ""))
+	companion_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ThemeService.style_label(companion_name, int(Tuning.FONT_SIZE_BODY * 0.8), ThemeService.INK, true)
+	companion_row.add_child(companion_name)
+	_main_vb.add_child(companion_row)
 
 	# progression calme : une pastille par zone de l'épisode
 	var dots_wrap := CenterContainer.new()

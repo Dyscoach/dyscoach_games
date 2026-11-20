@@ -98,13 +98,11 @@ func _build_ui() -> void:
 	_train_box.add_theme_constant_override("separation", ThemeService.min_spacing())
 	train_center.add_child(_train_box)
 
-	# tambour au centre-bas : grande cible tactile
+	# tambour au centre-bas : grande cible tactile, DESSINÉE (jamais un emoji nu)
 	var drum_center := CenterContainer.new()
 	_main_vb.add_child(drum_center)
 	_drum = Button.new()
-	_drum.text = "🥁" if ThemeService.age_band == "6-8" or ThemeService.age_band == "9-11" else "Tambour"
-	_drum.add_theme_font_override("font", ThemeService.font_bold())
-	_drum.add_theme_font_size_override("font_size", 96)
+	_drum.text = ""
 	var d := maxf(ThemeService.min_touch_target() * 1.6, 240.0)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = ThemeService.ACCENT
@@ -114,6 +112,10 @@ func _build_ui() -> void:
 	sb2.bg_color = ThemeService.ACCENT.darkened(0.15)
 	_drum.add_theme_stylebox_override("pressed", sb2)
 	_drum.custom_minimum_size = Vector2(d, d)
+	# le tambour dessiné remplit le bouton rond (décoratif, le bouton garde le clic)
+	var drum_art := BuddyArt.make("drum", _is_sober(), d * 1.15)
+	drum_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_drum.add_child(drum_art)
 	_drum.pressed.connect(_on_drum)
 	drum_center.add_child(_drum)
 

@@ -71,6 +71,14 @@ func _build_ui() -> void:
 	ThemeService.style_label(_model_label, int(Tuning.FONT_SIZE_TITLE * 0.8), ThemeService.ACCENT, true)
 	_main_vb.add_child(_model_label)
 
+	# écran radar dessiné sous le modèle : l'univers du jeu enfin visible (décoratif)
+	var radar_row := HBoxContainer.new()
+	radar_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	radar_row.add_theme_constant_override("separation", 24)
+	var radar_art := BuddyArt.make("radar", _is_sober(), 170.0)
+	radar_row.add_child(radar_art)
+	_main_vb.add_child(radar_row)
+
 	# progression calme : une pastille par grille de la configuration
 	var dots_wrap := CenterContainer.new()
 	_dots = ProgressDots.new()
