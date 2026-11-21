@@ -13,7 +13,11 @@ const proto = JSON.parse(readFileSync(new URL("./protocol.json", import.meta.url
 
 console.log("— schéma du protocole —");
 check(proto.protocol_name === "dyscoach-play", "nom du protocole");
-check(proto.protocol_version === "1.1.0", "version 1.1.0");
+check(proto.protocol_version === "1.2.0", "version 1.2.0");
+check(proto.def && proto.def.def_version === "1.0.0", "contrat DEF 1.0.0 présent (section def)");
+check(typeof proto.def.invariants.answer_never_sent === "string", "invariant DEF answer_never_sent documenté");
+check(proto.def.public_projection.includes("answer_key"), "projection publique : answer_key retiré");
+check(typeof proto.def.server_routes.list === "string" && proto.def.server_routes.list.includes("exercises/generate"), "routes façade documentées");
 check(typeof proto.invariants.one_session_end === "string", "invariant un seul session_end documenté");
 
 console.log("— messages host_to_game —");
