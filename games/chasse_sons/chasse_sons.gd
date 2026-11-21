@@ -14,7 +14,7 @@ var _round_no: int = 0
 var _found_in_round: int = 0
 var _targets_in_round: int = 0
 var _main_vb: VBoxContainer = null
-var _status: Label = null
+var _status: StatusBanner = null
 var _items_layer: Control = null
 var _speaker: Button = null
 var _instruction: Label = null
@@ -90,9 +90,7 @@ func _build_ui() -> void:
 	_items_layer.resized.connect(_relayout_round.bind(), CONNECT_DEFERRED)
 	_main_vb.add_child(_items_layer)
 
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ThemeService.style_label(_status, int(Tuning.FONT_SIZE_BODY * 0.9), ThemeService.INK_SOFT)
+	_status = StatusBanner.new()
 	_main_vb.add_child(_status)
 
 func on_start() -> void:
@@ -290,7 +288,7 @@ func _on_replay_instruction() -> void:
 
 func _set_status(text: String) -> void:
 	if _status != null:
-		_status.text = text
+		_status.show_message(text)
 
 func on_pause() -> void:
 	SessionTimer.pause()

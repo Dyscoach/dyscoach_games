@@ -85,7 +85,8 @@ func _test_error_requeues_other_target() -> void:
 	var requeued: Dictionary = game._queue[game._queue.size() - 1]["item"]
 	check(int(requeued.get("target_index", -1)) == 1, "la paire revient avec l'AUTRE mot comme cible (rat)")
 	# statut ECAR : les deux mots redits
-	check(game._status.text.contains("Presque") or game._status.text.contains("Les deux mots"), "retour ECAR affiché")
+	var duo_msg: String = game._status.message_text()
+	check(duo_msg.contains("Presque") or duo_msg.contains("Les deux mots"), "retour ECAR affiché")
 	game.queue_free()
 
 func _test_events_conformity() -> void:

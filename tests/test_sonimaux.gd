@@ -108,7 +108,7 @@ func _test_pending_animation() -> void:
 		if str(ev.get("name")) == "creature_evolved":
 			evolved = true
 	check(evolved, "pending_animation jouée (creature_evolved émis)")
-	check(game._status.text.contains("Bibi"), "message d'évolution nomme la créature (Bibi)")
+	check(game._status.message_text().contains("Bibi"), "message d'évolution nomme la créature (Bibi)")
 	game.queue_free()
 
 # --- enchaînement des zones : lancer une zone instancie le bon mini-jeu ---

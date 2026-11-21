@@ -16,7 +16,7 @@ var _zones_done: Array = []
 var _active_zone_game: MiniGame = null
 var _phase: String = "intro"        # intro | map | zone | outro | rest | done
 var _main_vb: VBoxContainer = null
-var _status: Label = null
+var _status: StatusBanner = null
 var _story_label: Label = null
 var _buttons_box: VBoxContainer = null
 var _carnet_btn: Button = null
@@ -113,9 +113,7 @@ func _build_ui() -> void:
 	dots_wrap.add_child(_dots)
 	_main_vb.add_child(dots_wrap)
 
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ThemeService.style_label(_status, int(Tuning.FONT_SIZE_BODY * 0.8), ThemeService.INK_SOFT)
+	_status = StatusBanner.new()
 	_main_vb.add_child(_status)
 
 	_buttons_box = VBoxContainer.new()
@@ -306,7 +304,7 @@ func _creature_name(creature_id: String) -> String:
 
 func _set_status(text: String) -> void:
 	if _status != null:
-		_status.text = text
+		_status.show_message(text)
 
 func _is_sober() -> bool:
 	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"

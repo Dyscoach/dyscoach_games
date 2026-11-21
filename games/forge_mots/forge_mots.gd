@@ -28,7 +28,7 @@ var _item_start_ms: int = 0
 var _main_vb: VBoxContainer = null
 var _slots_box: HBoxContainer = null
 var _reserve_grid: GridContainer = null
-var _status: Label = null
+var _status: StatusBanner = null
 var _speaker: Button = null
 var _validate_btn: Button = null
 var _dots: ProgressDots = null
@@ -92,9 +92,7 @@ func _build_ui() -> void:
 	dots_wrap.add_child(_dots)
 	_main_vb.add_child(dots_wrap)
 
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
+	_status = StatusBanner.new()
 	_main_vb.add_child(_status)
 
 	# zone centrale : image (carte neutre si absente) + cases — hauteur adaptative :
@@ -584,7 +582,7 @@ func _build_sentence() -> void:
 
 func _set_status(text: String) -> void:
 	if _status != null:
-		_status.text = text
+		_status.show_message(text)
 
 func _show_summary() -> void:
 	if not _finished and not _finish_requested:

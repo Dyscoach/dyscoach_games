@@ -22,9 +22,7 @@ var _matched_pairs: int = 0
 var _flips_count: int = 0
 var _main_vb: VBoxContainer = null
 var _grid: GridContainer = null
-var _status: Label = null
-var _status_icon: Label = null
-var _status_box: HBoxContainer = null
+var _status: StatusBanner = null
 var _dots: ProgressDots = null
 var _buddy: Buddy = null
 var _title_label: Label = null
@@ -89,19 +87,9 @@ func _build_ui() -> void:
 	dots_wrap.add_child(_dots)
 	_main_vb.add_child(dots_wrap)
 
-	# statut : icône dessinée (jamais la couleur seule) + message court
-	_status_box = HBoxContainer.new()
-	_status_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	_status_box.add_theme_constant_override("separation", 12)
-	_main_vb.add_child(_status_box)
-	_status_icon = Label.new()
-	_status_icon.text = ""
-	ThemeService.style_label(_status_icon, Tuning.FONT_SIZE_BODY, ThemeService.GOOD, true)
-	_status_box.add_child(_status_icon)
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
-	_status_box.add_child(_status)
+	# notification : bandeau large dédié (icône + message), hors colonne pastilles
+	_status = StatusBanner.new()
+	_main_vb.add_child(_status)
 
 	var center := CenterContainer.new()
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -271,10 +259,7 @@ func _all_matched() -> void:
 
 func _set_status(text: String, icon: String = "") -> void:
 	if _status != null:
-		_status.text = text
-	if _status_icon != null:
-		_status_icon.text = icon
-		_status_icon.visible = icon != ""
+		_status.show_message(text, icon)
 
 func on_pause() -> void:
 	SessionTimer.pause()

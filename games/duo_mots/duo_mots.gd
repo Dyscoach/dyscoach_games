@@ -13,7 +13,7 @@ var _attempts: int = 0
 var _item_start_ms: int = 0
 var _main_vb: VBoxContainer = null
 var _cards_row: HBoxContainer = null
-var _status: Label = null
+var _status: StatusBanner = null
 var _speaker: Button = null
 var _dots: ProgressDots = null
 var _buddy: Buddy = null
@@ -78,9 +78,7 @@ func _build_ui() -> void:
 	dots_wrap.add_child(_dots)
 	_main_vb.add_child(dots_wrap)
 
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
+	_status = StatusBanner.new()
 	_main_vb.add_child(_status)
 
 	var center := CenterContainer.new()
@@ -278,7 +276,7 @@ func _requeue_with_other_target() -> void:
 
 func _set_status(text: String, icon: String = "") -> void:
 	if _status != null:
-		_status.text = text
+		_status.show_message(text, icon)
 
 func on_pause() -> void:
 	SessionTimer.pause()

@@ -1,12 +1,17 @@
 extends Node
 ## Applique le thème de la configuration (palette, fond, habillage) sans changer les règles.
 ## Respecte reduce_motion (pas de secousse, pas de particules) et la taille de texte.
-## Police OpenDyslexic partout ; fond #F8F7FF ; fort contraste ; minuscules ; pas de cursive.
+## Police Andika (SIL OFL, conçue pour lecteurs débutants : b/d/p/q distincts,
+## accents français complets, formes épurées) ; OpenDyslexic en repli si absente.
+## Fond #F8F7FF ; fort contraste ; minuscules ; pas de cursive.
 
 signal theme_applied
 
-const FONT_REGULAR := "res://assets/fonts/OpenDyslexic-Regular.otf"
-const FONT_BOLD := "res://assets/fonts/OpenDyslexic-Bold.otf"
+const FONT_REGULAR := "res://assets/fonts/Andika-Regular.ttf"
+const FONT_BOLD := "res://assets/fonts/Andika-Bold.ttf"
+## Repli si Andika absente du build (suppression accidentelle).
+const FONT_FALLBACK_REGULAR := "res://assets/fonts/OpenDyslexic-Regular.otf"
+const FONT_FALLBACK_BOLD := "res://assets/fonts/OpenDyslexic-Bold.otf"
 
 # Palette de base ( WCAG AA sur fond clair )
 const BG := Color("F8F7FF")
@@ -50,12 +55,12 @@ func apply(config: Dictionary) -> void:
 
 func font_regular() -> Font:
 	if _font_regular == null:
-		_font_regular = load(FONT_REGULAR)
+		_font_regular = load(FONT_REGULAR) if ResourceLoader.exists(FONT_REGULAR) else load(FONT_FALLBACK_REGULAR)
 	return _font_regular
 
 func font_bold() -> Font:
 	if _font_bold == null:
-		_font_bold = load(FONT_BOLD)
+		_font_bold = load(FONT_BOLD) if ResourceLoader.exists(FONT_BOLD) else load(FONT_FALLBACK_BOLD)
 	return _font_bold
 
 func min_touch_target() -> float:

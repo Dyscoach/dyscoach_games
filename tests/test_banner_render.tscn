@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testbannrnd1"]
+
+[ext_resource type="Script" path="res://tests/test_banner_render.gd" id="1_bnrnd"]
+
+[node name="TestBannerRender" type="Node"]
+script = ExtResource("1_bnrnd")

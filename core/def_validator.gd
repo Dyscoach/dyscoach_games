@@ -14,7 +14,10 @@ extends RefCounted
 ## l'appelant affiche l'écran d'erreur calme (jamais de crash).
 
 const SCHEMA_VERSION := 1
-const TEMPLATE_IDS := ["memo_mots", "duo_mots", "syllabo", "radar_lettres", "forge_mots", "chasse_sons", "sonimaux"]
+## sandbox = game_id de DÉVELOPPEMENT (main.gd GAMES) : légitime en exécution
+## locale/host_test, jamais servi par la plateforme. Toléré pour ne pas casser
+## le bac à sable et les fumées dev.
+const TEMPLATE_IDS := ["memo_mots", "duo_mots", "syllabo", "radar_lettres", "forge_mots", "chasse_sons", "sonimaux", "sandbox"]
 const SUBJECTS := ["francais", "mathematiques", "lecture", "langues", "sciences", "autre"]
 const DIFFICULTY_MIN := 1
 const DIFFICULTY_MAX := 5

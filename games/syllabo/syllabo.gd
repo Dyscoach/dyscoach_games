@@ -12,7 +12,7 @@ var _auto_validated: bool = false
 var _last_tap_ms: int = 0
 var _item_start_ms: int = 0
 var _main_vb: VBoxContainer = null
-var _status: Label = null
+var _status: StatusBanner = null
 var _word_label: Label = null
 var _drum: Button = null
 var _train_box: HBoxContainer = null
@@ -81,9 +81,7 @@ func _build_ui() -> void:
 	dots_wrap.add_child(_dots)
 	_main_vb.add_child(dots_wrap)
 
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ThemeService.style_label(_status, Tuning.FONT_SIZE_BODY, ThemeService.INK)
+	_status = StatusBanner.new()
 	_main_vb.add_child(_status)
 
 	_word_label = Label.new()
@@ -287,7 +285,7 @@ func _process(_delta: float) -> void:
 
 func _set_status(text: String) -> void:
 	if _status != null:
-		_status.text = text
+		_status.show_message(text)
 
 func _is_sober() -> bool:
 	return ThemeService.age_band == "12-14" or ThemeService.age_band == "15-16"
