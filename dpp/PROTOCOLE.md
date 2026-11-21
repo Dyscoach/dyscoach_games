@@ -32,7 +32,7 @@ Règles d'indépendance :
    `tests/test_core.gd` rejouent des messages du schéma, et la page `tools/host_test.html`
    est une implémentation hôte réelle utilisable par l'équipe plateforme comme bac à sable.
 
-## 3. Schéma des messages (protocol.json, version 1.1)
+## 3. Schéma des messages (protocol.json, version 1.2)
 
 ### 3.1 Enveloppe commune
 
@@ -153,3 +153,27 @@ en production.
 - Champ retiré = bump majeur du protocole (les jeux anciens ne peuvent pas être cassés).
 - Les dessins/images restent hors contrat : le jeu affiche une carte neutre si
   `image_id` n'a pas de ressource correspondante et signale `error image_missing`.
+
+## 9. Contrat DEF (v1.2.0 — section `def` de protocol.json)
+
+Le **DEF (Dyscoach Exercise Format)** est le scénario pédagogique versionné que
+la plateforme génère (déterministe aujourd'hui, modèle IA demain) et dont elle
+déduit la `config` DPP envoyée au jeu. Règle fondamentale : **l'IA ne produit
+jamais de code Godot, uniquement des données DEF**.
+
+- **Contenu public / corrigé privé séparés** : `answer_key` (item → réponse +
+  explication) reste sur le serveur ; le jeu soumet ses réponses à
+  `POST /api/game/v1/sessions/{id}/attempts` qui revalide côté plateforme.
+- **Projection publique** : config DPP = DEF moins `answer_key`, plus
+  session_id/limits/a11y de la session. Tout champ DEF inconnu du jeu est
+  ignoré (tolerant_reader).
+- **Validé avant service** : toute génération passe le validateur DEF serveur
+  (`src/lib/def.ts`) AVANT stockage ; côté moteur, `core/def_validator.gd`
+  verrouille les invariants sur la config reçue (aucun champ de corrigé à
+  aucune profondeur, mots interdits, prénoms, bornes metadata).
+- **Routes de la façade** : `GET /api/game/v1/templates`,
+  `POST /exercises/generate`, `GET /exercises/{id}`, `POST /sessions`,
+  `POST /sessions/{id}/attempts|events|complete` (auth JWT plateforme).
+- **Métadonnées** : matière/niveau/compétence/difficulté (1-5) et adaptations
+  (consigne courte, audio, densité visuelle, guidage) — jamais de prénom ni de
+  diagnostic médical, uniquement des besoins fonctionnels.
