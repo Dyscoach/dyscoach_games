@@ -30,9 +30,11 @@ const ANSWER_KEY_FIELDS := [
 const FORBIDDEN_WORDS := ["faux", "rate", "perdu", "nul", "therapie", "soin", "reeducation"]
 
 ## Prénoms français courants (minuscules) — invariant no_personal_data :
-## un prénom dans une consigne ou un item est une fuite de données.
+## un prénom dans une consigne est une fuite de données. Scannés dans la
+## CONSIGNE uniquement (les items sont des contenus validés par le game_id :
+## « jade » du lexique duo_mots reste légitime dans une carte).
 const COMMON_FIRST_NAMES := [
-	"alice", "emma", "louise", "chloe", "leah", "manon", "ava", "jade2", "rose",
+	"alice", "emma", "louise", "chloe", "leah", "manon", "ava", "jade", "rose",
 	"lucie", "lina", "margaux", "paul", "gabriel", "louis", "raphael", "adam",
 	"theo", "antonin", "sacha", "jean", "pierre", "lucas", "hugo", "leo", "noah",
 	"anna", "clara", "marie", "julia", "camille", "lea", "sarah", "lola",

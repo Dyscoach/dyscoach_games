@@ -64,6 +64,14 @@ func _on_config(payload: Dictionary) -> void:
 		_current_game.add_child(err)
 		Bridge.send_error("config_invalid", "; ".join(cfg.errors))
 		return
+	# Contrat DEF v1.2.0 — défense en profondeur : la config reçue est la
+	# projection publique d'un DEF ; AUCUN champ de corrigé (answer_key,
+	# expected_word…) ne doit traverser le pont. Refus calme sinon.
+	var def_check := DefValidator.new(payload)
+	if not def_check.validity:
+		_load_scene(FALLBACK_SCENE)
+		Bridge.send_error("config_invalid", "; ".join(def_check.errors))
+		return
 	var item_errors := cfg.validate_items(cfg.game_id)
 	if not item_errors.is_empty():
 		_load_scene(FALLBACK_SCENE)
