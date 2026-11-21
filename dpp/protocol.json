@@ -1,6 +1,6 @@
 {
   "protocol_name": "dyscoach-play",
-  "protocol_version": "1.1.0",
+  "protocol_version": "1.2.0",
   "description": "Contrat d'interface entre la plateforme dyscoach.com (hôte) et les jeux Godot (invités) via iframe + postMessage.",
   "invariants": {
     "no_personal_data": "Aucune donnée personnelle dans les messages : ni prénom, ni texte libre.",
@@ -267,9 +267,49 @@
     "host_config_timeout_ms": 8000,
     "host_config_timeout_note": "Délai max conseillé entre ready et config|config_error ; au-delà, sans réponse, le jeu affiche l'écran d'erreur calme (toujours récupérable par un nouveau ready)."
   },
+  "def": {
+    "description": "Contrat DEF (Dyscoach Exercise Format) : scénario pédagogique versionné, source des configs DPP envoyées aux jeux. Le contenu élève (public) et le corrigé (privé) sont TOUJOURS séparés : le corrigé reste côté plateforme, le jeu soumet ses réponses au serveur qui les revalide. L'IA ne produit JAMAIS de code Godot, uniquement des données DEF.",
+    "def_version": "1.0.0",
+    "invariants": {
+      "answer_never_sent": "La/les réponse(s) correcte(s) ne sont JAMAIS envoyées au jeu ; la plateforme vérifie chaque tentative côté serveur (route attempts).",
+      "schema_versioned": "Tout document DEF porte schema_version ; un champ inconnu est ignoré par le lecteur, un champ retiré exige un bump majeur.",
+      "no_personal_data_def": "Métadonnées limitées à matière/niveau/compétence/difficulté/adaptations ; jamais de prénom ni de diagnostic médical — uniquement des besoins fonctionnels.",
+      "ai_validated": "Toute génération (IA ou déterministe) passe le validateur DEF AVANT stockage et AVANT conversion en config DPP ; un DEF invalide n'est jamais servi."
+    },
+    "fields": {
+      "schema_version": "1 (entier)",
+      "exercise_id": "string opaque unique (préfixe jeu, ex. memo_mots_<uuid tronqué>)",
+      "template_id": "game_id DPP existant (memo_mots | duo_mots | syllabo | radar_lettres | forge_mots | chasse_sons | sonimaux)",
+      "metadata": {
+        "subject": "francais | mathematiques | lecture | langues | sciences | autre",
+        "level": "libellé de niveau (CP…CM2, 6e…TERM) — informatif",
+        "skill_id": "compétence référentielle (ex. lexique_orthogonal, discrimination_visuelle)",
+        "difficulty": "entier 1-5"
+      },
+      "accessibility": {
+        "instruction_length": "short | standard",
+        "audio_support": "bool — consigne et mots porteurs d'audio",
+        "visual_density": "low | standard",
+        "writing_load": "reduced | standard",
+        "guidance": "step_by_step | direct",
+        "target_size": "large | standard"
+      },
+      "instruction": {
+        "text": "consigne élève (courte, une tâche)"
+      },
+      "content": "structure par template_id — items validés par le validateur du game_id (GameConfig.validate_*_items)",
+      "answer_key": "PRIVÉ — mapping item_id → réponse correcte + explication ; jamais sérialisé dans une config DPP ni dans le PCK"
+    },
+    "public_projection": "La config DPP envoyée au jeu = DEF moins answer_key, plus session_id/limits/a11y de la session. Tout champ DEF inconnu du jeu est ignoré (tolerant_reader).",
+    "server_routes": {
+      "facade": "/api/game/v1/* (auth JWT existante)",
+      "list": "GET templates · POST exercises/generate · GET exercises/{id} · POST sessions · POST sessions/{id}/attempts · POST sessions/{id}/events · POST sessions/{id}/complete",
+      "security": "Aucune clé IA dans les artefacts Godot ; les appels partent de la plateforme authentifiée, jamais du jeu."
+    }
+  },
   "versioning": {
     "policy": "semver",
-    "minor": "nouveau message ou nouveau champ optionnel (toléré par les implémentations anciennes)",
+    "minor": "nouveau message ou nouveau champ optionnel (toléré par les implémentations anciennes) ; ajout d'une section additive (ex. def) sans toucher aux messages du pont",
     "major": "champ retiré ou sémantique modifiée (les jeux anciens ne doivent pas être cassés)"
   },
   "contract_gap_notes": {

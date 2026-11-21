@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testdefval001"]
+
+[ext_resource type="Script" path="res://tests/test_def_validator.gd" id="1_defval"]
+
+[node name="TestDefValidator" type="Node"]
+script = ExtResource("1_defval")
